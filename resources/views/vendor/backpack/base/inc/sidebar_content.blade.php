@@ -20,3 +20,14 @@
 
   </ul>
 </li> 
+@if (backpack_user()->can('Manage Orders'))
+<li class="nav-item"><a class="nav-link" href="{{ backpack_url('orders') }}"><i class="nav-icon la la-question"></i> Orders</a></li>
+@endif
+@if (backpack_user()->can('Manage Order Status'))
+<li class="nav-item"><a class="nav-link" href="{{ backpack_url('status') }}"><i class="nav-icon la la-question"></i> Statuses</a></li>
+@endif
+@if (backpack_user()->can('Manage Status Log'))
+<li class="nav-item"><a class="nav-link" href="{{ backpack_url('order-status') }}"><i class="nav-icon la la-question"></i> Order statuses</a></li>
+@endif
+
+<li class="nav-item"><a class="nav-link" href="{{ backpack_url('complexity') }}"><i class="nav-icon la la-question"></i> Complexities</a></li>
