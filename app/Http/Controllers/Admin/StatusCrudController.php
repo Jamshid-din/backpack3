@@ -39,7 +39,17 @@ class StatusCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::column('name');
+        $this->crud->column('name');
+        $this->crud->addColumn([
+          'name' => 'color',
+          'label' => 'Color',
+          'type' => 'custom_html',
+          'value'    => function ($entry)
+          {
+            return "<button class='btn' style='background-color: ".$entry->color.";'>".$entry->color."</button>";
+          },
+
+        ]);
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -56,11 +66,16 @@ class StatusCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation([
-            // 'name' => 'required|min:2',
+        $this->crud->setValidation([
+            'name' => 'required',
         ]);
 
-        CRUD::field('name');
+        $this->crud->field('name');
+        $this->crud->addField([
+          'name' => 'color',
+          'label' => 'Color',
+          'type' => 'color',
+        ]);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

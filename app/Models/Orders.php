@@ -13,7 +13,7 @@ class Orders extends Model
     protected $fillable = [
       'date_of_issue',
       'phone_number',
-      'name',
+      'client_name',
       'desc',
       'complexity',
       'color_fabric',
@@ -25,8 +25,14 @@ class Orders extends Model
       'user_id',
       'delivery',
       'status_id',
-      'media',
+      'image',
+      'created_at',
+      'fake_image',
     ];
+
+    protected $fakeColumns = ['fake_image'];	
+    protected $casts = ['fake_image' => 'array'];
+
 
     public function statuses()
     {
@@ -40,6 +46,17 @@ class Orders extends Model
 
     public function hasStatus()
     {
-      return $this->belongsTo(Status::class, 'status_id', 'id');
+      return $this->belongsTo(Status::class, 'status_id', 'id')->orderBy('created_at','asc');
+    }
+    
+    public function setImageAttribute($value)
+    {
+        $attribute_name = "image";
+        $disk = "public";
+        $destination_path = "thumbnails";
+
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path, $fileName = null);
+
+    // return $this->attributes[{$attribute_name}]; // uncomment if this is a translatable field
     }
 }

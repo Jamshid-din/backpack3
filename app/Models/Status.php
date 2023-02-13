@@ -10,6 +10,7 @@ class Status extends Model
 {
     use HasFactory, CrudTrait;
     protected $fillable = [
-      'name'
+      'name',
+      'color'
     ];
 }

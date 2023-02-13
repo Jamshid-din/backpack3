@@ -39,14 +39,45 @@ class OrderStatusCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::column('order_id');
-        CRUD::column('status_id');
-
+        $this->crud->addColumn([
+          'name' => 'order_id',
+          'label' => 'Order ID',
+          'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+          'name' => 'status.name', // the relationships are handled automatically
+          'label' => 'Status', // the grid's column heading
+          'type' => 'text'
+        ]);
+        $this->crud->addColumn([
+          'name' => 'created_at', // the relationships are handled automatically
+          'label' => 'Updated at', // the grid's column heading
+          'type' => 'datetime'
+        ]);
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']); 
          */
+    }
+
+    protected function setupShowOperation()
+    {
+      $this->crud->addColumn([
+        'name' => 'order_id',
+        'label' => 'Order ID',
+        'type' => 'text'
+      ]);
+      $this->crud->addColumn([
+        'name' => 'status.name', // the relationships are handled automatically
+        'label' => 'Status', // the grid's column heading
+        'type' => 'text'
+      ]);
+      $this->crud->addColumn([
+        'name' => 'updated_at', // the relationships are handled automatically
+        'label' => 'Updated at', // the grid's column heading
+        'type' => 'datetime'      
+      ]);
     }
 
     /**
@@ -63,7 +94,11 @@ class OrderStatusCrudController extends CrudController
 
         CRUD::field('order_id');
         CRUD::field('status_id');
-
+        $this->crud->addField([
+          'name' => 'created_at', // the relationships are handled automatically
+          'label' => 'Updated at', // the grid's column heading
+          'type' => 'datetime'      
+        ]);
         /**
          * Fields can be defined using the fluent syntax or array syntax:
          * - CRUD::field('price')->type('number');

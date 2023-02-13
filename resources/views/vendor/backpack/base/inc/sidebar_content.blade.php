@@ -20,7 +20,7 @@
 
   </ul>
 </li> 
-@if (backpack_user()->can('Manage Orders'))
+@if (backpack_user()->can('view orders'))
 <li class="nav-item"><a class="nav-link" href="{{ backpack_url('orders') }}"><i class="nav-icon la la-question"></i> Orders</a></li>
 @endif
 @if (backpack_user()->can('Manage Order Status'))

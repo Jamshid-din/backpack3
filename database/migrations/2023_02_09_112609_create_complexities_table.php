@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('complexities', function (Blueprint $table) {
             $table->id();
-            $table->string('char');
-            $table->string('value');
+            $table->char('char')->unique();
+            $table->integer('value');
             $table->timestamps();
         });
     }
