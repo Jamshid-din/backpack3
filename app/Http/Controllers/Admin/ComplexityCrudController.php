@@ -29,6 +29,7 @@ class ComplexityCrudController extends CrudController
         CRUD::setModel(\App\Models\Complexity::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/complexity');
         CRUD::setEntityNameStrings('complexity', 'complexities');
+        $this->crud->orderBy('complexity_order', 'ASC');
     }
 
     /**
@@ -41,7 +42,8 @@ class ComplexityCrudController extends CrudController
     {
         CRUD::column('char');
         CRUD::column('value');
-
+        CRUD::column('complexity_order');
+        
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
@@ -57,12 +59,27 @@ class ComplexityCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation([
-            // 'name' => 'required|min:2',
+        $this->crud->setValidation([
+            'char' => 'required|min:10',
+            'value' => 'required',
+            'complexity_order' => 'required|max:3',
         ]);
 
-        CRUD::field('char');
-        CRUD::field('value');
+        $this->crud->field('char');
+        $this->crud->addField([
+          'name'  =>  'value',
+          'label' =>  'Value',
+          'type'  => 'number',
+          'attributes' => ["step" => "any"], // allow decimals
+          // 'suffix'     => ".00",
+        ]);
+        $this->crud->addField([
+          'name'  => 'complexity_order',
+          'label' => 'Complexity order',
+          'type'  => 'number',
+          'default' => 5,
+          'hint'  => 'Maximum up to 999'
+        ]);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

@@ -19,18 +19,23 @@ return new class extends Migration
           $table->string('phone_number', 15);
           $table->string('client_name');
           $table->text('desc')->nullable();
-          $table->char('complexity', 10);   # From Complexity table
+          $table->char('complexity', 50);   # From Complexity table
           $table->string('color_fabric');
           $table->string('backdrop');
-          $table->integer('quantity');
+          $table->unsignedSmallInteger('quantity');
           $table->string('size');
-          $table->unsignedInteger('prepayment');
-          $table->unsignedInteger('price');
+          $table->unsignedInteger('prepayment_cur_id');
+          $table->decimal('prepayment', $precision = 10, $scale = 2);
+          $table->unsignedInteger('price_cur_id');
+          $table->decimal('price', $precision = 10, $scale = 2);
           $table->unsignedBigInteger('user_id');
           $table->string('delivery');
-          $table->unsignedBigInteger('status_id');
+          $table->unsignedInteger('status_id');
           $table->string('image')->nullable();
           $table->timestamps();
+
+          $table->foreign('prepayment_cur_id')->references('id')->on('currencies')->onDelete('cascade');
+          $table->foreign('price_cur_id')->references('id')->on('currencies')->onDelete('cascade');
           $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
           $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
         });

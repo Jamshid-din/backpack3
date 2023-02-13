@@ -12,6 +12,13 @@ class Complexity extends Model
 
     protected $fillable = [
       'char',
-      'value'
+      'currency_id',
+      'value',
+      'complexity_order',
     ];
+
+    public function currency()
+    {
+      return $this->belongsTo(Currency::class, 'currency_id', 'id')->orderBy('currency_order','asc');
+    }
 }

@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\StatusRequest;
+use App\Http\Requests\CurrencyRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Class StatusCrudController
+ * Class CurrencyCrudController
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class StatusCrudController extends CrudController
+class CurrencyCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -26,10 +26,10 @@ class StatusCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Status::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/status');
-        CRUD::setEntityNameStrings('status', 'statuses');
-        $this->crud->orderBy('status_order', 'ASC');
+        CRUD::setModel(\App\Models\Currency::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/currency');
+        CRUD::setEntityNameStrings('currency', 'currencies');
+        $this->crud->orderBy('currency_order', 'ASC');
     }
 
     /**
@@ -41,17 +41,9 @@ class StatusCrudController extends CrudController
     protected function setupListOperation()
     {
         $this->crud->column('name');
-        $this->crud->addColumn([
-          'name' => 'color',
-          'label' => 'Color',
-          'type' => 'custom_html',
-          'value'    => function ($entry)
-          {
-            return "<button class='btn' style='background-color: ".$entry->color.";'>".$entry->color."</button>";
-          },
-
-        ]);
-        $this->crud->column('status_order');
+        $this->crud->column('short_name');
+        $this->crud->column('symbol');
+        $this->crud->column('currency_order');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -69,22 +61,19 @@ class StatusCrudController extends CrudController
     protected function setupCreateOperation()
     {
         $this->crud->setValidation([
-            'name' => 'required',
-            'status_order' => 'required|max:3',
+          'name' => 'required',
+          'currency_order' => 'required|max:3',
         ]);
 
         $this->crud->field('name');
+        $this->crud->field('short_name');
+        $this->crud->field('symbol');
         $this->crud->addField([
-          'name' => 'color',
-          'label' => 'Color',
-          'type' => 'color',
-        ]);
-        $this->crud->addField([
-          'name'  =>  'status_order',
-          'label' =>  'Status order',
-          'type'  =>  'number',
+          'name'  => 'currency_order',
+          'label' => 'Currency order',
+          'type'  => 'number',
           'default' => 5,
-          'hint' => 'Maximum 999'
+          'hint'  => 'Maximum up to 999'
         ]);
 
         /**

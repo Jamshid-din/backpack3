@@ -206,10 +206,28 @@ class OrdersCrudController extends CrudController
         ]);
         $this->crud->field('size');
         $this->crud->addField([
+          'name'      => '', // The db column name
+          'label'     => 'Prepayment currency', // Table column heading
+          'type'      => 'select',
+          'name'      => 'prepayment_cur_id', // the column that contains the ID of that connected entity;
+          'entity'    => 'prepayment_currency', // the method that defines the relationship in your Model
+          'attribute' => 'symbol', // foreign key attribute that is shown to user
+          'model'     => "App\Models\Currency", // foreign key model
+        ]);
+        $this->crud->addField([
           'name'      => 'prepayment', // The db column name
           'label'     => 'Prepayment', // Table column heading
           'type'      => 'number',
           // 'thousands_sep' => ','
+        ]);
+        $this->crud->addField([
+          'name'      => '', // The db column name
+          'label'     => 'Prepayment currency', // Table column heading
+          'type'      => 'select',
+          'name'      => 'price_cur_id', // the column that contains the ID of that connected entity;
+          'entity'    => 'price_currency', // the method that defines the relationship in your Model
+          'attribute' => 'symbol', // foreign key attribute that is shown to user
+          'model'     => "App\Models\Currency", // foreign key model
         ]);
         $this->crud->addField([
           'name'      => 'price', // The db column name

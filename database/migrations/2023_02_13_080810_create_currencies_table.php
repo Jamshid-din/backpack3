@@ -13,23 +13,23 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('complexities', function (Blueprint $table) {
+        Schema::create('currencies', function (Blueprint $table) {
             $table->unsignedInteger('id')->autoIncrement();
-            $table->char('char', 10)->unique();
-            $table->unsignedInteger('currency_id');
-            $table->unsignedSmallInteger('currency_order');
-            $table->decimal('value', $precision = 10, $scale = 2);
+            $table->string('name');
+            $table->char('short_name', 20);
+            $table->char('symbol', 10);
+            $table->unsignedSmallInteger('currency_order')->nullable();
             $table->timestamps();
         });
     }
 
-    /** 
+    /**
      * Reverse the migrations.
      *
      * @return void
      */
     public function down()
     {
-        Schema::dropIfExists('complexities');
+        Schema::dropIfExists('currencies');
     }
 };
