@@ -28,7 +28,7 @@ return new class extends Migration
           $table->decimal('prepayment', $precision = 10, $scale = 2);
           $table->unsignedInteger('price_cur_id');
           $table->decimal('price', $precision = 10, $scale = 2);
-          $table->unsignedBigInteger('user_id');
+          $table->unsignedBigInteger('user_id')->nullable();
           $table->string('delivery');
           $table->unsignedInteger('status_id');
           $table->string('image')->nullable();

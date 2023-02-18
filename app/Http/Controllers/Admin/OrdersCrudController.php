@@ -207,33 +207,35 @@ class OrdersCrudController extends CrudController
         $this->crud->field('size');
         $this->crud->addField([
           'name'      => '', // The db column name
-          'label'     => 'Prepayment currency', // Table column heading
+          'label'     => 'Precurrency', // Table column heading
           'type'      => 'select',
           'name'      => 'prepayment_cur_id', // the column that contains the ID of that connected entity;
           'entity'    => 'prepayment_currency', // the method that defines the relationship in your Model
           'attribute' => 'symbol', // foreign key attribute that is shown to user
           'model'     => "App\Models\Currency", // foreign key model
+          'wrapper' => ['class' => 'form-group col-sm-4'],
         ]);
         $this->crud->addField([
           'name'      => 'prepayment', // The db column name
           'label'     => 'Prepayment', // Table column heading
           'type'      => 'number',
-          // 'thousands_sep' => ','
+          'wrapper' => ['class' => 'form-group col-sm-8'],
         ]);
         $this->crud->addField([
           'name'      => '', // The db column name
-          'label'     => 'Prepayment currency', // Table column heading
+          'label'     => 'Currency', // Table column heading
           'type'      => 'select',
           'name'      => 'price_cur_id', // the column that contains the ID of that connected entity;
           'entity'    => 'price_currency', // the method that defines the relationship in your Model
           'attribute' => 'symbol', // foreign key attribute that is shown to user
           'model'     => "App\Models\Currency", // foreign key model
+          'wrapper' => ['class' => 'form-group col-sm-4'],
         ]);
         $this->crud->addField([
           'name'      => 'price', // The db column name
           'label'     => 'Price', // Table column heading
           'type'      => 'number',
-          // 'thousands_sep' => ','
+          'wrapper' => ['class' => 'form-group col-sm-8'],
         ]);
         $this->crud->addField([
           // 1-n relationship
@@ -282,6 +284,7 @@ class OrdersCrudController extends CrudController
             // 'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URLs this will make a URL that is valid for the number of minutes specified
         ]);
 
+        Widget::add()->type('script')->content('/assets/js/admin/forms/change-user.js');
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -298,6 +301,7 @@ class OrdersCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
+      dd($_REQUEST);
       $this->setupCreateOperation();
     }
 }

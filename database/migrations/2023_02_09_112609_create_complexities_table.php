@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedInteger('id')->autoIncrement();
             $table->char('char', 10)->unique();
             $table->unsignedInteger('currency_id');
-            $table->unsignedSmallInteger('currency_order');
+            $table->unsignedSmallInteger('complexity_order');
             $table->decimal('value', $precision = 10, $scale = 2);
             $table->timestamps();
         });

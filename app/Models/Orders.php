@@ -48,7 +48,7 @@ class Orders extends Model
 
     public function hasStatus()
     {
-      return $this->belongsTo(Status::class, 'status_id', 'id')->orderBy('status_order');
+      return $this->belongsTo(Status::class, 'status_id', 'id')->orderBy('status_order', 'desc');
     }
     
     public function prepayment_currency()

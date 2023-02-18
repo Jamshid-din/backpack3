@@ -19,6 +19,6 @@ class Complexity extends Model
 
     public function currency()
     {
-      return $this->belongsTo(Currency::class, 'currency_id', 'id')->orderBy('currency_order','asc');
+      return $this->belongsTo(Currency::class, 'currency_id', 'id');
     }
 }

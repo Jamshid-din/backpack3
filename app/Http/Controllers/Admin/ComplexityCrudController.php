@@ -41,6 +41,11 @@ class ComplexityCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('char');
+        $this->crud->addColumn([
+          'name' => 'currency.short_name', // the relationships are handled automatically
+          'label' => 'Currency', // the grid's column heading
+          'type' => 'text'
+        ]);
         CRUD::column('value');
         CRUD::column('complexity_order');
         
@@ -51,6 +56,7 @@ class ComplexityCrudController extends CrudController
          */
     }
 
+
     /**
      * Define what happens when the Create operation is loaded.
      * 
@@ -60,12 +66,22 @@ class ComplexityCrudController extends CrudController
     protected function setupCreateOperation()
     {
         $this->crud->setValidation([
-            'char' => 'required|min:10',
+            'char' => 'required|max:10',
+            'currency_id' => 'required',
             'value' => 'required',
             'complexity_order' => 'required|max:3',
         ]);
 
         $this->crud->field('char');
+        $this->crud->addField([
+          // 1-n relationship
+          'label'     => 'Currency', // Table column heading
+          'type'      => 'select',
+          'name'      => 'currency_id', // the column that contains the ID of that connected entity;
+          'entity'    => 'currency', // the method that defines the relationship in your Model
+          'attribute' => 'short_name', // foreign key attribute that is shown to user
+          'model'     => "App\Models\Currency", // foreign key model
+        ]);
         $this->crud->addField([
           'name'  =>  'value',
           'label' =>  'Value',
