@@ -85,13 +85,13 @@ class OrdersCrudController extends CrudController
       $this->crud->column('price');
       $this->crud->column('delivery');
       $this->crud->addColumn([
-        'name' => 'image',
-        'label' => 'Image',
-        'type'  => 'custom_html',
-        'value' => function ($entry)
-        {
-          return '<img src="/storage/'.$entry->image.'" class="img-thumbnail" alt="thumbnail image" height="400" width="400">';
-        }
+        'name' => 'photos',
+        'label' => 'Photos',
+        'type'  => 'multiple_upload',
+        // 'value' => function ($entry)
+        // {
+        //   return '<img src="/storage/'.$entry->photos.'" class="img-thumbnail" alt="thumbnail image" height="400" width="400">';
+        // }
       ]);
     }
 
@@ -112,11 +112,6 @@ class OrdersCrudController extends CrudController
           'orderable'  => true,
         ]);
 
-        // $this->crud->addColumn([
-        //   'name' => 'users.name', // the relationships are handled automatically
-        //   'label' => 'Artist', // the grid's column heading
-        //   'type' => 'text'
-        // ]);
         $this->crud->addColumn([
           // 1-n relationship
           'label'     => ' User name ', // Table column heading
@@ -136,16 +131,6 @@ class OrdersCrudController extends CrudController
           'attribute' => 'name', // foreign key attribute that is shown to user
           'model'     => "App\Models\Status", // foreign key model
         ]);
-
-        // $this->crud->addColumn([
-        //   'name' => 'hasStatus.color', // the relationships are handled automatically
-        //   'label' => 'Status', // the grid's column heading
-        //   'type' => 'custom_status',
-        //   'value' => function ($entry)
-        //   {
-        //       return "<button class='btn' style='background-color: ".$entry->hasStatus->color.";'></button> ".$entry->hasStatus->name;
-        //   }
-        // ]);
         $this->crud->column('date_of_issue');
         $this->crud->column('phone_number');
         $this->crud->column('client_name');
@@ -158,7 +143,7 @@ class OrdersCrudController extends CrudController
         $this->crud->column('prepayment');
         $this->crud->column('price');
         $this->crud->column('delivery');
-        $this->crud->column('image');
+        $this->crud->column('photos');
         $this->crud->orderBy('created_at');
         Widget::add(
           [
@@ -276,21 +261,20 @@ class OrdersCrudController extends CrudController
           'name' => 'delivery',
           'value' => 'Tashkent'
         ]);
-        $this->crud->addField([
-          // Upload
-            'name'      => 'image',
-            'label'     => 'Image',
-            'type'      => 'custom_upload',
-            'upload'    => true,
-            'disk'      => 'local', // if you store files in the /public folder, please omit this; if you store them in /storage or S3, please specify it;
-            'preview'   => true,
-            // optional:
-            // 'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URLs this will make a URL that is valid for the number of minutes specified
-        ]);
+
+        $this->crud->addField([   // Upload
+          'name'      => 'photos',
+          'label'     => 'Photos',
+          'type'      => 'custom_upload_multiple',
+          'upload'    => true,
+          'disk'      => 'uploads', // if you store files in the /public folder, please omit this; if you store them in /storage or S3, please specify it;
+          // optional:
+          // 'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URLs this will make a URL that is valid for the number of minutes specified
+        ],);
         $this->crud->addField([
           // 1-n relationship
           'label'     => 'Artists', // Table column heading
-          'type'      => 'select',
+          'type'      => 'custom_user_select',
           'name'      => 'user_id', // the column that contains the ID of that connected entity;
           'entity'    => 'users', // the method that defines the relationship in your Model
           'attribute' => 'name', // foreign key attribute that is shown to user

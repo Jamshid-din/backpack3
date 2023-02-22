@@ -31,7 +31,7 @@ return new class extends Migration
           $table->unsignedBigInteger('user_id')->nullable();
           $table->string('delivery');
           $table->unsignedInteger('status_id');
-          $table->string('image')->nullable();
+          $table->string('photos')->nullable();
           $table->timestamps();
 
           $table->foreign('prepayment_cur_id')->references('id')->on('currencies')->onDelete('cascade');

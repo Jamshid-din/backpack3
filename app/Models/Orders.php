@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+
 
 class Orders extends Model
 {
     use HasFactory, CrudTrait;
 
     protected $fillable = [
+      'photos',
       'date_of_issue',
       'phone_number',
       'client_name',
@@ -27,13 +31,11 @@ class Orders extends Model
       'user_id',
       'delivery',
       'status_id',
-      'image',
       'created_at',
-      'fake_image',
     ];
 
-    protected $fakeColumns = ['fake_image'];	
-    protected $casts = ['fake_image' => 'array'];
+      
+    protected $casts = ['photos' => 'array'];
 
 
     public function statuses()
@@ -61,14 +63,13 @@ class Orders extends Model
       return $this->belongsTo(Currency::class, 'price_cur_id', 'id')->orderBy('currency_order');
     }
 
-    public function setImageAttribute($value)
+    public function setPhotosAttribute($value)
     {
-        $attribute_name = "image";
+        $attribute_name = "photos";
         $disk = "public";
-        $destination_path = "order_thumbnails";
-
-        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path, $fileName = null);
-
-        // return $this->attributes[{$attribute_name}]; // uncomment if this is a translatable field
+        $destination_path = "photos";
+    
+        $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
     }
+    
 }

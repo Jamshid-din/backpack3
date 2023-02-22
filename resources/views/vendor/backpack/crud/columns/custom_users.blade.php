@@ -19,7 +19,7 @@
 <div style="{{$column['style']??''}}">
   {{ $column['prefix'] }}
   <select class="custom-users-column custom-users-column{{$entry->id}} form-control" data-id={{$entry->id}}>
-    <option value="null">-</option>
+    <option value="">-</option>
   
     @foreach ($users as $key => $item)
         <option value="{{$item->id}}" @if ($item->id == $entry->user_id) selected @endif>

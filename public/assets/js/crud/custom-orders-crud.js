@@ -2,7 +2,7 @@
 
 jQuery(document).ready(function($) {
 
-
+  let csrf_token = $('meta[name="csrf-token"]').attr('content');
 
   $("body").on("change", ".custom-status-column", function(){
     let row_id = $(this).data('id');
@@ -17,10 +17,13 @@ jQuery(document).ready(function($) {
       element.value = selected_option_value;
     })
     console.log('changing from list table...')
-    let new_data = {
+
+    let new_data =  {
       'id': row_id,
-      'status_id': selected_option_value
+      'user_id': $('.custom-users-column'+row_id)[0].value,
+      'status_id': parseInt($(this).val()),
     };
+    sendUpdateRequest(row_id, new_data);
   });
 
 
@@ -76,17 +79,25 @@ jQuery(document).ready(function($) {
       }
     })
 
-    let new_data = {
+    let new_data =  {
       'id': row_id,
       'user_id': selected_option_value,
-      'status_id': parseInt(status_id)
+      'status_id': parseInt(status_id),
     };
 
-
+    sendUpdateRequest(row_id, new_data);
     
   })
 
-
-
+  function sendUpdateRequest(row_id, new_data) {
+    $.ajax({
+      type: 'PUT',
+      url: '/editable-column/' + row_id,
+      data: {new_data},
+      success: function(data) {
+        // console.log(data);
+      }
+    });
+  }
 });
 
