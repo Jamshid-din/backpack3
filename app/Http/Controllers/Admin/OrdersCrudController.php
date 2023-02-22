@@ -35,6 +35,10 @@ class OrdersCrudController extends CrudController
         CRUD::setEntityNameStrings('orders', 'orders');
     }
 
+    protected function setColumnsDetails()
+    {
+
+    }
     /**
      * Define what happens when the List operation is loaded.
      * 
@@ -93,34 +97,55 @@ class OrdersCrudController extends CrudController
 
     protected function setupListOperation()
     {
-      if (!backpack_user()->can('edit orders')) {
-        $this->crud->denyAccess('edit');
-      }
-      if (!backpack_user()->can('delete orders')) {
-        $this->crud->denyAccess('delete');
-      }
-      $this->crud->column('id')->makeFirst();
-      $this->crud->addColumn([
-        'name' => 'created_at', // the relationships are handled automatically
-        'label' => 'Created at', // the grid's column heading
-        'type' => 'date',
-        'orderable'  => true,
-      ]);
-
-      $this->crud->addColumn([
-        'name' => 'users.name', // the relationships are handled automatically
-        'label' => 'Artist', // the grid's column heading
-        'type' => 'text'
-      ]);
-      $this->crud->addColumn([
-        'name' => 'hasStatus.color', // the relationships are handled automatically
-        'label' => 'Status', // the grid's column heading
-        'type' => 'custom_html',
-        'value' => function ($entry)
-        {
-            return "<button class='btn' style='background-color: ".$entry->hasStatus->color.";'></button> ".$entry->hasStatus->name;
+      $this->crud->enableResponsiveTable();
+        if (!backpack_user()->can('edit orders')) {
+          $this->crud->denyAccess('edit');
         }
-      ]);
+        if (!backpack_user()->can('delete orders')) {
+          $this->crud->denyAccess('delete');
+        }
+        $this->crud->column('id')->makeFirst();
+        $this->crud->addColumn([
+          'name' => 'created_at', // the relationships are handled automatically
+          'label' => 'Created at', // the grid's column heading
+          'type' => 'date',
+          'orderable'  => true,
+        ]);
+
+        // $this->crud->addColumn([
+        //   'name' => 'users.name', // the relationships are handled automatically
+        //   'label' => 'Artist', // the grid's column heading
+        //   'type' => 'text'
+        // ]);
+        $this->crud->addColumn([
+          // 1-n relationship
+          'label'     => ' User name ', // Table column heading
+          'type'      => 'custom_users',
+          'name'      => 'user_id', // the column that contains the ID of that connected entity;
+          'entity'    => 'users', // the method that defines the relationship in your Model
+          'attribute' => 'name', // foreign key attribute that is shown to user
+          'model'     => "App\Models\User", // foreign key model
+        ]);
+
+        $this->crud->addColumn([
+          // 1-n relationship
+          'label'     => 'Status', // Table column heading
+          'type'      => 'custom_status',
+          'name'      => 'status_id', // the column that contains the ID of that connected entity;
+          'entity'    => 'hasStatus', // the method that defines the relationship in your Model
+          'attribute' => 'name', // foreign key attribute that is shown to user
+          'model'     => "App\Models\Status", // foreign key model
+        ]);
+
+        // $this->crud->addColumn([
+        //   'name' => 'hasStatus.color', // the relationships are handled automatically
+        //   'label' => 'Status', // the grid's column heading
+        //   'type' => 'custom_status',
+        //   'value' => function ($entry)
+        //   {
+        //       return "<button class='btn' style='background-color: ".$entry->hasStatus->color.";'></button> ".$entry->hasStatus->name;
+        //   }
+        // ]);
         $this->crud->column('date_of_issue');
         $this->crud->column('phone_number');
         $this->crud->column('client_name');
@@ -135,6 +160,15 @@ class OrdersCrudController extends CrudController
         $this->crud->column('delivery');
         $this->crud->column('image');
         $this->crud->orderBy('created_at');
+        Widget::add(
+          [
+            'type'     => 'script',
+            'content'  => 'assets/js/crud/custom-orders-crud.js',
+            // optional
+            'stack'    => 'after_scripts', // default is after_scripts
+          ]
+        );
+
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
@@ -150,22 +184,21 @@ class OrdersCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        $this->crud->setValidation([
-            'date_of_issue' => 'required',
-            'phone_number' => 'required',
-            'client_name' => 'required',
-            'desc' => 'required',
-            'complexity' => 'required',
-            'backdrop' => 'required',
-            'quantity' => 'required',
-            'size' => 'required',
-            'prepayment' => 'required',
-            'price' => 'required',
-            'delivery' => 'required',
-            'status_id' => 'required',
-            'user_id' => 'required',
-        ]);
-
+        // $this->crud->setValidation([
+        //     'date_of_issue' => 'required',
+        //     'phone_number' => 'required',
+        //     'client_name' => 'required',
+        //     'desc' => 'required',
+        //     'complexity' => 'required',
+        //     'backdrop' => 'required',
+        //     'quantity' => 'required',
+        //     'size' => 'required',
+        //     'prepayment' => 'required',
+        //     'price' => 'required',
+        //     'delivery' => 'required',
+        //     'status_id' => 'required',
+        // ]);
+        
         $this->crud->addField([
           'name' => 'created_at',
           'label' => 'Created at',
@@ -238,6 +271,23 @@ class OrdersCrudController extends CrudController
           'wrapper' => ['class' => 'form-group col-sm-8'],
         ]);
         $this->crud->addField([
+          'label' => 'Delivery',
+          'type' => 'text',
+          'name' => 'delivery',
+          'value' => 'Tashkent'
+        ]);
+        $this->crud->addField([
+          // Upload
+            'name'      => 'image',
+            'label'     => 'Image',
+            'type'      => 'custom_upload',
+            'upload'    => true,
+            'disk'      => 'local', // if you store files in the /public folder, please omit this; if you store them in /storage or S3, please specify it;
+            'preview'   => true,
+            // optional:
+            // 'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URLs this will make a URL that is valid for the number of minutes specified
+        ]);
+        $this->crud->addField([
           // 1-n relationship
           'label'     => 'Artists', // Table column heading
           'type'      => 'select',
@@ -246,17 +296,11 @@ class OrdersCrudController extends CrudController
           'attribute' => 'name', // foreign key attribute that is shown to user
           'model'     => "App\Models\User", // foreign key model
         ]);
-        $this->crud->addField([
-          'label' => 'Delivery',
-          'type' => 'text',
-          'name' => 'delivery',
-          'value' => 'Tashkent'
-        ]);
 
         $this->crud->addField([
           // 1-n relationship
           'label'     => 'Status', // Table column heading
-          'type'      => 'select',
+          'type'      => 'custom_status_select',
           'name'      => 'status_id', // the column that contains the ID of that connected entity;
           'entity'    => 'hasStatus', // the method that defines the relationship in your Model
           'attribute' => 'name', // foreign key attribute that is shown to user
@@ -270,18 +314,6 @@ class OrdersCrudController extends CrudController
                 ]);
             },
           ],
-        ]);
-
-        $this->crud->addField([
-          // Upload
-            'name'      => 'image',
-            'label'     => 'Image',
-            'type'      => 'custom_upload',
-            'upload'    => true,
-            'disk'      => 'local', // if you store files in the /public folder, please omit this; if you store them in /storage or S3, please specify it;
-            'preview'   => true,
-            // optional:
-            // 'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URLs this will make a URL that is valid for the number of minutes specified
         ]);
 
         Widget::add()->type('script')->content('/assets/js/admin/forms/change-user.js');
@@ -301,7 +333,6 @@ class OrdersCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-      dd($_REQUEST);
       $this->setupCreateOperation();
     }
 }

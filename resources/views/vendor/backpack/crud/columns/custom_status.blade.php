@@ -1,0 +1,62 @@
+{{-- single relationships (1-1, 1-n) --}}
+@php
+    $column['attribute'] = $column['attribute'] ?? (new $column['model'])->identifiableAttribute();
+    $column['value'] = $column['value'] ?? $crud->getRelatedEntriesAttributes($entry, $column['entity'], $column['attribute']);
+    $column['escaped'] = $column['escaped'] ?? true;
+    $column['prefix'] = $column['prefix'] ?? '';
+    $column['suffix'] = $column['suffix'] ?? '';
+    $column['limit'] = $column['limit'] ?? 32;
+    
+    if($column['value'] instanceof \Closure) {
+        $column['value'] = $column['value']($entry);
+    }
+    
+    foreach ($column['value'] as &$value) {
+        $value = Str::limit($value, $column['limit'], '…');
+    }
+    $models = App\Models\Status::all();
+@endphp
+<div class="d-flex" style="min-width: 200px">
+  <button class='status-color{{$entry->id}} btn' style='background-color: {{ $entry->hasStatus->color}}'></button>
+  
+  {{ $column['prefix'] }}
+  <select class="custom-status-column custom-status-column{{$entry->id}} form-control" data-id={{$entry->id}}>
+    @foreach ($models as $key => $item)
+      <option value="{{$item->id}}" data-color="{{$item->color}}"
+        @if ($entry->hasStatus->id == $item->id)
+          selected 
+        @elseif ($key == 0 && $entry->hasStatus->id != $item->id)
+          disabled
+        @endif>
+        {{ $item->name }}
+      </option>
+    @endforeach
+  </select>
+  {{ $column['suffix'] }}
+</div>
+
+{{-- <span>
+    @if(count($column['value']))
+        {{ $column['prefix'] }}
+        @foreach($column['value'] as $key => $text)
+            @php
+                $related_key = $key;
+            @endphp
+
+            <span class="d-inline-flex">
+                @includeWhen(!empty($column['wrapper']), 'crud::columns.inc.wrapper_start')
+                    @if($column['escaped'])
+                        {{ $text }}
+                    @else
+                        {!! $text !!}
+                    @endif
+                @includeWhen(!empty($column['wrapper']), 'crud::columns.inc.wrapper_end')
+
+                @if(!$loop->last), @endif
+            </span>
+        @endforeach
+    @else
+        {{ $column['default'] ?? '-' }}
+    @endif
+</span> --}}
+
