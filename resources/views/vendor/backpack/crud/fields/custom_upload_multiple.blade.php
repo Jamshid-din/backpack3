@@ -61,7 +61,7 @@
           <li class="list-group-item square" style="object-fit: cover; word-break: break-all;">
             <img 
               class="list-group-item-image image-to-preview"
-              style="max-height: 50px; max-width: 50px" 
+              style="max-height: 50px; max-width: 50px; cursor: pointer;" 
               src="{{ asset(\Storage::disk($field['disk'])->url($file_path)) }}" 
               alt="Image {{$key}}"
             >
