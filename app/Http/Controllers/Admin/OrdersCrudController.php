@@ -86,12 +86,8 @@ class OrdersCrudController extends CrudController
       $this->crud->column('delivery');
       $this->crud->addColumn([
         'name' => 'photos',
-        'label' => 'Photos',
-        'type'  => 'multiple_upload',
-        // 'value' => function ($entry)
-        // {
-        //   return '<img src="/storage/'.$entry->photos.'" class="img-thumbnail" alt="thumbnail image" height="400" width="400">';
-        // }
+        'label' => 'Photosssss',
+        'type'  => 'custom_multiple_upload',
       ]);
     }
 
@@ -143,7 +139,11 @@ class OrdersCrudController extends CrudController
         $this->crud->column('prepayment');
         $this->crud->column('price');
         $this->crud->column('delivery');
-        $this->crud->column('photos');
+        $this->crud->addColumn([
+          'name' => 'photos',
+          'label' => 'Photosssss',
+          'type'  => 'custom_upload',
+        ]);
         $this->crud->orderBy('created_at');
         Widget::add(
           [
