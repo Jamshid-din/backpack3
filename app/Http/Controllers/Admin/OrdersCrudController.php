@@ -35,10 +35,6 @@ class OrdersCrudController extends CrudController
         CRUD::setEntityNameStrings('orders', 'orders');
     }
 
-    protected function setColumnsDetails()
-    {
-
-    }
     /**
      * Define what happens when the List operation is loaded.
      * 
@@ -88,7 +84,17 @@ class OrdersCrudController extends CrudController
         'name' => 'photos',
         'label' => 'Photosssss',
         'type'  => 'custom_multiple_upload',
+        'upload'    => true,
+        'disk'      => 'uploads',
       ]);
+      Widget::add(
+        [
+          'type'     => 'script',
+          'content'  => 'assets/js/crud/custom-orders-show.js',
+          // optional
+          'stack'    => 'after_scripts', // default is after_scripts
+        ]
+      );
     }
 
     protected function setupListOperation()
@@ -139,11 +145,6 @@ class OrdersCrudController extends CrudController
         $this->crud->column('prepayment');
         $this->crud->column('price');
         $this->crud->column('delivery');
-        $this->crud->addColumn([
-          'name' => 'photos',
-          'label' => 'Photosssss',
-          'type'  => 'custom_upload',
-        ]);
         $this->crud->orderBy('created_at');
         Widget::add(
           [
@@ -169,20 +170,20 @@ class OrdersCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        // $this->crud->setValidation([
-        //     'date_of_issue' => 'required',
-        //     'phone_number' => 'required',
-        //     'client_name' => 'required',
-        //     'desc' => 'required',
-        //     'complexity' => 'required',
-        //     'backdrop' => 'required',
-        //     'quantity' => 'required',
-        //     'size' => 'required',
-        //     'prepayment' => 'required',
-        //     'price' => 'required',
-        //     'delivery' => 'required',
-        //     'status_id' => 'required',
-        // ]);
+        $this->crud->setValidation([
+            'date_of_issue' => 'required',
+            'phone_number' => 'required',
+            'client_name' => 'required',
+            'desc' => 'required',
+            'complexity' => 'required',
+            'backdrop' => 'required',
+            'quantity' => 'required',
+            'size' => 'required',
+            'prepayment' => 'required|max:8',
+            'price' => 'required|max:8',
+            'delivery' => 'required',
+            'status_id' => 'required',
+        ]);
         
         $this->crud->addField([
           'name' => 'created_at',

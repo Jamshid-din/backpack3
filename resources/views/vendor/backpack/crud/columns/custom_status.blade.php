@@ -35,28 +35,3 @@
   {{ $column['suffix'] }}
 </div>
 
-{{-- <span>
-    @if(count($column['value']))
-        {{ $column['prefix'] }}
-        @foreach($column['value'] as $key => $text)
-            @php
-                $related_key = $key;
-            @endphp
-
-            <span class="d-inline-flex">
-                @includeWhen(!empty($column['wrapper']), 'crud::columns.inc.wrapper_start')
-                    @if($column['escaped'])
-                        {{ $text }}
-                    @else
-                        {!! $text !!}
-                    @endif
-                @includeWhen(!empty($column['wrapper']), 'crud::columns.inc.wrapper_end')
-
-                @if(!$loop->last), @endif
-            </span>
-        @endforeach
-    @else
-        {{ $column['default'] ?? '-' }}
-    @endif
-</span> --}}
-

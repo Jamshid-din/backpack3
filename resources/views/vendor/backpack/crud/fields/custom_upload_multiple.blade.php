@@ -263,17 +263,17 @@
             });
           });
         }
-        $('.image-to-preview').click(function() {
-          var modal = $('#image-preview-modal');
-          var img = $(this).attr('src');
-          var modalImg = $('#img01');
-          modal.css('display', 'block');
-          modalImg.attr('src', img);
-        });
+          $('.image-to-preview').click(function() {
+            var modal = $('#image-preview-modal');
+            var img = $(this).attr('src');
+            var modalImg = $('#img01');
+            modal.css('display', 'block');
+            modalImg.attr('src', img);
+          });
 
-        $('.close, .modal').click(function() {
-          $('#image-preview-modal').css('display', 'none');
-        });
+          $('.close, .modal').click(function() {
+            $('#image-preview-modal').css('display', 'none');
+          });
       </script>
       @endLoadOnce
   @endpush

@@ -100,7 +100,7 @@ class Orders extends Model
             foreach (request()->file($attribute_name) as $key => $file) {
                 if ($file->isValid()) {
                     // 1. Generate a new file name
-                    $new_file_name = time().$key.'_'.random_int(1, 9999).$file->getClientOriginalName();
+                    $new_file_name = time().$key.' '.random_int(1, 9999).$file->getClientOriginalName();
 
                     // 2. Move the new file to the correct path
                     $file_path = $file->storeAs($destination_path, $new_file_name, $disk);
