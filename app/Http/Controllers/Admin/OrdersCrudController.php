@@ -5,10 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\OrdersRequest;
 use App\Models\Orders;
 use App\Models\OrderStatus;
-use App\Models\User;
+use App\Models\TelegramConfig;
+use App\Models\TelegramInfo;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\CRUD\app\Library\Widget;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+
+use Prologue\Alerts\Facades\Alert as FacadesAlert;
 
 /**
  * Class OrdersCrudController
@@ -17,12 +22,22 @@ use Backpack\CRUD\app\Library\Widget;
  */
 class OrdersCrudController extends CrudController
 {
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as traitStore; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
+    
+    // For Telegram Bot
+
+    protected $telegram_details = [
+      'token' => '',
+      'chatId' => '',
+      'channel' => '',
+      'text'  => '',
+    ];
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
      * 
@@ -33,6 +48,7 @@ class OrdersCrudController extends CrudController
         CRUD::setModel(Orders::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/orders');
         CRUD::setEntityNameStrings('orders', 'orders');
+        $this->crud->denyAccess('delete');
     }
 
     /**
@@ -80,9 +96,21 @@ class OrdersCrudController extends CrudController
       $this->crud->column('prepayment');
       $this->crud->column('price');
       $this->crud->column('delivery');
+      $this->crud->addColumn(
+        [
+          // run a function on the CRUD model and show its return value
+          'name'  => 'telegram_link',
+          'label' => 'Telegram link', // Table column heading
+          'type'  => 'custom_html',
+          'value' => function ($entry) {
+            return '<a href="'.$entry->telegram_link.'" target="_blank">'.$entry->telegram_link.'</a>';
+          }
+       ]);
+
+    
       $this->crud->addColumn([
         'name' => 'photos',
-        'label' => 'Photosssss',
+        'label' => 'Photos',
         'type'  => 'custom_multiple_upload',
         'upload'    => true,
         'disk'      => 'uploads',
@@ -133,6 +161,7 @@ class OrdersCrudController extends CrudController
           'attribute' => 'name', // foreign key attribute that is shown to user
           'model'     => "App\Models\Status", // foreign key model
         ]);
+
         $this->crud->column('date_of_issue');
         $this->crud->column('phone_number');
         $this->crud->column('client_name');
@@ -146,6 +175,15 @@ class OrdersCrudController extends CrudController
         $this->crud->column('price');
         $this->crud->column('delivery');
         $this->crud->orderBy('created_at');
+
+        $stack = 'line';
+        $name = 'tested';
+        $model_function_name = 'sendTestMessageToTelegram';
+        $position = 'beginning';
+        $this->crud->addButtonFromModelFunction($stack, $name, $model_function_name, $position);
+        $this->crud->addButton($stack, $name, 'model_function', 'checkTelegramMessage', $position); // possible types are: 'view', 'model_function'
+
+
         Widget::add(
           [
             'type'     => 'script',
@@ -161,6 +199,7 @@ class OrdersCrudController extends CrudController
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']); 
          */
     }
+
 
     /**
      * Define what happens when the Create operation is loaded.
@@ -268,7 +307,7 @@ class OrdersCrudController extends CrudController
           'label'     => 'Photos',
           'type'      => 'custom_upload_multiple',
           'upload'    => true,
-          'disk'      => 'uploads', // if you store files in the /public folder, please omit this; if you store them in /storage or S3, please specify it;
+          // 'disk'      => 'uploads', // if you store files in the /public folder, please omit this; if you store them in /storage or S3, please specify it;
           // optional:
           // 'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URLs this will make a URL that is valid for the number of minutes specified
         ],);
@@ -310,6 +349,72 @@ class OrdersCrudController extends CrudController
          */
     }
 
+    public function store()
+    {
+        $this->crud->hasAccessOrFail('create');
+
+        // execute the FormRequest authorization and validation, if one is required
+        $request = $this->crud->validateRequest();
+
+        // register any Model Events defined on fields
+        $this->crud->registerFieldEvents();
+
+        // insert item in the db
+        $item = $this->crud->create($this->crud->getStrippedSaveRequest($request));
+        $this->data['entry'] = $this->crud->entry = $item;
+
+        // Set telegram details
+        $telegram_config = TelegramConfig::first();
+        if ($telegram_config) {
+          $this->telegram_details['token'] = $telegram_config->token;
+          $this->telegram_details['chatId'] = $telegram_config->chat_id;
+          $this->telegram_details['channel'] = substr($telegram_config->chat_id, 4);
+  
+          // Text to send to Telegram
+          $this->telegram_details['text'] = 
+            'Order ID: '.   $this->data['entry']->id."\n".
+            'Date of issue: '.$this->data['entry']->date_of_issue."\n".
+            'Client name: '.$this->data['entry']->client_name."\n".
+            'Complexity: '. $this->data['entry']->complexity."\n".
+            'Color fabric: '.$this->data['entry']->color_fabric."\n".
+            'Backdrop: '.   $this->data['entry']->backdrop."\n".
+            'Quantity: '.   $this->data['entry']->quantity."\n".
+            'Size: '.       $this->data['entry']->size."\n".
+            'Delivery: '.   $this->data['entry']->delivery
+          ;
+  
+          // Send to Telegram and recive response
+          $response = (empty($this->data['entry']->photos)) ? 
+          $this->sendTextToTelegram():$this->sendTelegramWithPhotos($this->data['entry']->photos);
+  
+          $response = json_decode($response->body());
+  
+  
+          // Store response in to DB
+          $store_telegram_response = new TelegramInfo();
+          $store_telegram_response->order_id = $this->data['entry']->id;
+          $store_telegram_response->successful = $response->ok;
+          $store_telegram_response->response_body = json_encode($response->result);
+          $store_telegram_response->save();
+  
+          // Store telegram message link into orders table
+          if ($response->ok) {
+            $telegram_link = 'https://t.me/c/'.$this->telegram_details['channel'].'/'.$response->result->message_id;
+            Orders::find($this->data['entry']->id)->update([
+              'telegram_link' => $telegram_link
+            ]);
+          } 
+        }
+
+        // show a success message
+        FacadesAlert::success(trans('backpack::crud.insert_success'))->flash();
+
+        // save the redirect choice for next time
+        $this->crud->setSaveAction();
+
+        return $this->crud->performSaveAction($item->getKey());
+    }
+
     /**
      * Define what happens when the Update operation is loaded.
      * 
@@ -319,5 +424,63 @@ class OrdersCrudController extends CrudController
     protected function setupUpdateOperation()
     {
       $this->setupCreateOperation();
+    }
+
+    public function sendTextToTelegram()
+    {
+      $url = 'https://api.telegram.org/bot'.$this->telegram_details['token'].'/sendMessage';
+
+      $arrayQuery = array(
+        'chat_id' => $this->telegram_details['chatId'],
+        'text' => $this->telegram_details['text']
+      );		
+
+      return Http::post($url, $arrayQuery);
+    }
+
+    public function sendTelegramWithPhotos($path_photos)
+    {
+      if (count($path_photos) == 1) return $this->sendTelegramWithSinglePhoto($path_photos[0]);
+
+      $photos = [];
+      foreach ($path_photos as $key => $value) {
+        $storage_path = asset(Storage::disk('local')->url($value));
+        if ($key == 0) {
+          array_push($photos, [
+            'type' => 'photo',
+            'media' => $storage_path,
+            'caption' => $this->telegram_details['text'],
+          ]);
+        } else {
+          array_push($photos, [
+            'type' => 'photo',
+            'media' => $storage_path,
+          ]);
+        }
+      }
+
+      $url = 'https://api.telegram.org/bot'. $this->telegram_details['token'] .'/sendMediaGroup';
+
+      $arrayQuery = array(
+        'chat_id' => $this->telegram_details['chatId'],
+        'media' => json_encode(array_values($photos))
+      );		
+
+      return Http::post($url, $arrayQuery);
+    }
+
+    public function sendTelegramWithSinglePhoto($photo)
+    {
+      $photo_path = asset(Storage::disk('local')->url($photo));
+
+      $url = 'https://api.telegram.org/bot'.$this->telegram_details['token'].'/sendPhoto';
+
+      $arrayQuery = array(
+        'chat_id' => $this->telegram_details['chatId'],
+        'caption' => $this->telegram_details['text'],
+        'photo' => $photo_path
+      );
+
+      return Http::post($url, $arrayQuery);
     }
 }

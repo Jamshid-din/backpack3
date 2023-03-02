@@ -14,7 +14,7 @@
     foreach ($column['value'] as &$value) {
         $value = Str::limit($value, $column['limit'], '…');
     }
-    $models = App\Models\Status::all();
+    $models = App\Models\Status::orderBy('status_order')->get();
 @endphp
 <div class="d-flex" style="min-width: 200px">
   <button class='status-color{{$entry->id}} btn' style='background-color: {{ $entry->hasStatus->color}}'></button>

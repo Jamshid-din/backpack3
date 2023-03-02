@@ -21,4 +21,6 @@ Route::group([
     Route::crud('order-status', 'OrderStatusCrudController');
     Route::crud('complexity', 'ComplexityCrudController');
     Route::crud('currency', 'CurrencyCrudController');
+    Route::crud('telegram-config', 'TelegramConfigCrudController');
+    Route::get('telegram-config/send-test-message', 'TelegramConfigCrudController@sendTestMessage');
 }); // this should be the absolute last line of this file

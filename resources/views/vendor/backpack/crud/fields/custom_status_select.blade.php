@@ -10,7 +10,7 @@
     }
 
     if (!isset($field['options'])) {
-        $options = $field['model']::all();
+        $options = $field['model']::orderBy('status_order')->get();
         if(isset($field['orderBy']['column']) && isset($field['orderBy']['type'])) {
 
           if($field['orderBy']['type'] == 'asc') {

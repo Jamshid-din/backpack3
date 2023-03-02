@@ -32,3 +32,4 @@
 
 <li class="nav-item"><a class="nav-link" href="{{ backpack_url('complexity') }}"><i class="nav-icon la la-question"></i> Complexities</a></li>
 <li class="nav-item"><a class="nav-link" href="{{ backpack_url('currency') }}"><i class="nav-icon la la-question"></i> Currencies</a></li>
+<li class="nav-item"><a class="nav-link" href="{{ backpack_url('telegram-config') }}"><i class="nav-icon la la-question"></i> Telegram configs</a></li>

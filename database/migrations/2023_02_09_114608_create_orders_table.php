@@ -31,6 +31,7 @@ return new class extends Migration
           $table->unsignedBigInteger('user_id')->nullable();
           $table->string('delivery');
           $table->unsignedInteger('status_id');
+          $table->string('telegram_link')->nullable();
           $table->string('photos')->nullable();
           $table->timestamps();
 
