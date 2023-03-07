@@ -32,11 +32,13 @@ class Orders extends Model
       'delivery',
       'status_id',
       'telegram_link',
+      'archived',
       'created_at',
     ];
 
       
     protected $casts = ['photos' => 'array'];
+    protected $translatable = ['name', 'options'];
 
 
     public function statuses()
@@ -64,6 +66,16 @@ class Orders extends Model
       return $this->belongsTo(Currency::class, 'price_cur_id', 'id')->orderBy('currency_order');
     }
 
+    public function checkTelegramMessage()
+    {
+      return ($this->telegram_link) ? '<a href="'.$this->telegram_link.'" target="_blank" class="btn btn-sm btn-link"><i class="lab la-telegram-plane"></i></a>':'';
+    }
+
+    public function makeOrderArchived()
+    {
+      return (!$this->archived) ? '<a href="/admin/orders-make-archived/'.$this->id.'" class="btn btn-sm btn-link"><i class="las la-trash"></i></a>':'';
+    }
+
     public function setPhotosAttribute($value)
     {
         $attribute_name = "photos";
@@ -71,11 +83,6 @@ class Orders extends Model
         $destination_path = "photos";
     
         $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
-    }
-
-    public function checkTelegramMessage()
-    {
-      return '<a href="'.$this->telegram_link.'" target="_blank" class="btn btn-sm btn-link"><i class="lab la-telegram-plane"></i></a>';
     }
 
     public function uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path)

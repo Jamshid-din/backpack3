@@ -31,13 +31,13 @@ class OrdersCrudController extends CrudController
 
     
     // For Telegram Bot
-
     protected $telegram_details = [
       'token' => '',
       'chatId' => '',
       'channel' => '',
       'text'  => '',
     ];
+
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
      * 
@@ -45,10 +45,11 @@ class OrdersCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(Orders::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/orders');
-        CRUD::setEntityNameStrings('orders', 'orders');
+        $this->crud->setModel(Orders::class);
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/orders');
+        $this->crud->setEntityNameStrings('orders', 'orders');
         $this->crud->denyAccess('delete');
+        $this->crud->addButton('top', 'archive', 'view', 'crud::buttons.archive');
     }
 
     /**
@@ -127,7 +128,10 @@ class OrdersCrudController extends CrudController
 
     protected function setupListOperation()
     {
-      $this->crud->enableResponsiveTable();
+        $this->crud->disableResponsiveTable();
+
+        $this->crud->orderBy('created_at');
+
         if (!backpack_user()->can('edit orders')) {
           $this->crud->denyAccess('edit');
         }
@@ -174,15 +178,12 @@ class OrdersCrudController extends CrudController
         $this->crud->column('prepayment');
         $this->crud->column('price');
         $this->crud->column('delivery');
-        $this->crud->orderBy('created_at');
 
         $stack = 'line';
         $name = 'tested';
-        $model_function_name = 'sendTestMessageToTelegram';
         $position = 'beginning';
-        $this->crud->addButtonFromModelFunction($stack, $name, $model_function_name, $position);
         $this->crud->addButton($stack, $name, 'model_function', 'checkTelegramMessage', $position); // possible types are: 'view', 'model_function'
-
+        $this->crud->addButton($stack, $name, 'model_function', 'makeOrderArchived'); // possible types are: 'view', 'model_function'
 
         Widget::add(
           [
@@ -198,6 +199,56 @@ class OrdersCrudController extends CrudController
          * - CRUD::column('price')->type('number');
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']); 
          */
+    }
+
+    public function search()
+    {
+        $this->crud->hasAccessOrFail('list');
+        
+        $this->crud->applyUnappliedFilters();
+
+        $start = (int) request()->input('start');
+        $length = (int) request()->input('length');
+        $search = request()->input('search');
+
+        if (backpack_user()->can('Manage archives')) {
+          $this->crud->addClause('where', 'archived', '=', (int)request('archived')??0 );
+        } else {
+          $this->crud->addClause('where', 'archived', '=', 0 );
+        }
+
+
+        // if a search term was present
+        if ($search && $search['value'] ?? false) {
+            // filter the results accordingly
+            $this->crud->applySearchTerm($search['value']);
+        }
+        // start the results according to the datatables pagination
+        if ($start) {
+            $this->crud->skip($start);
+        }
+        // limit the number of results according to the datatables pagination
+        if ($length) {
+            $this->crud->take($length);
+        }
+        // overwrite any order set in the setup() method with the datatables order
+        $this->crud->applyDatatableOrder();
+
+        $entries = $this->crud->getEntries();
+
+        // if show entry count is disabled we use the "simplePagination" technique to move between pages.
+        if ($this->crud->getOperationSetting('showEntryCount')) {
+            $totalEntryCount = (int) (request()->get('totalEntryCount') ?: $this->crud->getTotalQueryCount());
+            $filteredEntryCount = $this->crud->getFilteredQueryCount() ?? $totalEntryCount;
+        } else {
+            $totalEntryCount = $length;
+            $filteredEntryCount = $entries->count() < $length ? 0 : $length + $start + 1;
+        }
+
+        // store the totalEntryCount in CrudPanel so that multiple blade files can access it
+        $this->crud->setOperationSetting('totalEntryCount', $totalEntryCount);
+
+        return $this->crud->getEntriesAsJsonForDatatables($entries, $totalEntryCount, $filteredEntryCount, $start);
     }
 
 
@@ -339,6 +390,13 @@ class OrdersCrudController extends CrudController
             },
           ],
         ]);
+        if (backpack_user()->can('Manage archives')) {
+          $this->crud->addField([
+            'name'  => 'archived',
+            'label' => 'Archived',
+            'type'  => 'boolean'
+          ]);
+        }
 
         Widget::add()->type('script')->content('/assets/js/admin/forms/change-user.js');
 
@@ -482,5 +540,17 @@ class OrdersCrudController extends CrudController
       );
 
       return Http::post($url, $arrayQuery);
+    }
+
+    public function makeOrderArchived($id)
+    {
+      $order = Orders::findOrFail($id);
+      $order->update([
+        'archived'  => 1
+      ]);
+
+      FacadesAlert::success('Successfully archived!')->flash();
+
+      return back();
     }
 }

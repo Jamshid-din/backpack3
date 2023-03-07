@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 use App\Http\Controllers\EditColumnController;
+
 Route::get('/', function () {
     return view('welcome');
 });

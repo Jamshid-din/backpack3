@@ -1,6 +1,13 @@
 <?php
 
+use Illuminate\Contracts\Session\Session as ContractsSessionSession;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Session;
+use Symfony\Component\HttpFoundation\Session\Session as SessionSession;
+
 
 // --------------------------
 // Custom Backpack Routes
@@ -17,10 +24,20 @@ Route::group([
     'namespace'  => 'App\Http\Controllers\Admin',
 ], function () { // custom admin routes
     Route::crud('orders', 'OrdersCrudController');
+    Route::get('orders-make-archived/{id}', 'OrdersCrudController@makeOrderArchived');
     Route::crud('status', 'StatusCrudController');
     Route::crud('order-status', 'OrderStatusCrudController');
     Route::crud('complexity', 'ComplexityCrudController');
     Route::crud('currency', 'CurrencyCrudController');
     Route::crud('telegram-config', 'TelegramConfigCrudController');
-    Route::get('telegram-config/send-test-message', 'TelegramConfigCrudController@sendTestMessage');
+    Route::get('lang/{locale}', 'LanguageController@switchLanguage');
+    
+    // function ($locale)
+    // {
+    //   App::setLocale($locale);
+    //   session()->put('locale', $locale);
+    
+    //   return redirect()->back();
+    // });
+    
 }); // this should be the absolute last line of this file

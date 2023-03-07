@@ -33,6 +33,7 @@ return new class extends Migration
           $table->unsignedInteger('status_id');
           $table->string('telegram_link')->nullable();
           $table->string('photos')->nullable();
+          $table->boolean('archived')->default(false);
           $table->timestamps();
 
           $table->foreign('prepayment_cur_id')->references('id')->on('currencies')->onDelete('cascade');

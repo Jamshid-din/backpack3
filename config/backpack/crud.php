@@ -14,8 +14,10 @@ return [
 
     'show_translatable_field_icon'     => true,
     'translatable_field_icon_position' => 'right', // left or right
-
     'locales' => [
+        "ru" => "Russian",
+        'en' => 'English',
+
         // "af_NA" => "Afrikaans (Namibia)",
         // "af_ZA" => "Afrikaans (South Africa)",
         // "af" => "Afrikaans",
@@ -132,7 +134,6 @@ return [
         // "en_GB" => "English (United Kingdom)",
         // "en_US" => "English (United States)",
         // "en_ZW" => "English (Zimbabwe)",
-        'en' => 'English',
         // "eo" => "Esperanto",
         // "et_EE" => "Estonian (Estonia)",
         // "et" => "Estonian",
@@ -176,7 +177,7 @@ return [
         // "fr_SN" => "French (Senegal)",
         // "fr_CH" => "French (Switzerland)",
         // "fr_TG" => "French (Togo)",
-        'fr' => 'French',
+        // 'fr' => 'French',
         // "ff_SN" => "Fulah (Senegal)",
         // "ff" => "Fulah",
         // "gl_ES" => "Galician (Spain)",
@@ -222,7 +223,7 @@ return [
         // "ga" => "Irish",
         // "it_IT" => "Italian (Italy)",
         // "it_CH" => "Italian (Switzerland)",
-        'it' => 'Italian',
+        // 'it' => 'Italian',
         // "ja_JP" => "Japanese (Japan)",
         // "ja" => "Japanese",
         // "kea_CV" => "Kabuverdianu (Cape Verde)",
@@ -327,7 +328,7 @@ return [
         // "pa" => "Punjabi",
         // "ro_MD" => "Romanian (Moldova)",
         // "ro_RO" => "Romanian (Romania)",
-        'ro' => 'Romanian',
+        // 'ro' => 'Romanian',
         // "rm_CH" => "Romansh (Switzerland)",
         // "rm" => "Romansh",
         // "rof_TZ" => "Rombo (Tanzania)",
@@ -335,7 +336,6 @@ return [
         // "ru_MD" => "Russian (Moldova)",
         // "ru_RU" => "Russian (Russia)",
         // "ru_UA" => "Russian (Ukraine)",
-        // "ru" => "Russian",
         // "rwk_TZ" => "Rwa (Tanzania)",
         // "rwk" => "Rwa",
         // "saq_KE" => "Samburu (Kenya)",
