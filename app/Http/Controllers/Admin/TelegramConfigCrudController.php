@@ -35,15 +35,22 @@ class TelegramConfigCrudController extends CrudController
         CRUD::setEntityNameStrings('telegram config', 'telegram configs');
         $telegram_config = TelegramConfig::first();
 
-        $this->crud->denyAccess('delete'); 
-        if ($telegram_config) {
+        if (!backpack_user()->can('telegram configs list')) {
+          $this->crud->denyAccess('list');
+        }
+        if (!backpack_user()->can('telegram configs update')) {
+          $this->crud->denyAccess('update');
+        }
+        if ($telegram_config || !backpack_user()->can('telegram configs update create')) {
           $this->crud->denyAccess('create');
         }
+        $this->crud->denyAccess('delete'); 
     }
 
     protected function setupShowOperation(){
       $this->setupListOperation();
     }
+
     /**
      * Define what happens when the List operation is loaded.
      * 
@@ -119,10 +126,7 @@ class TelegramConfigCrudController extends CrudController
     {
         $this->crud->hasAccessOrFail('create');
 
-        $token = $_REQUEST['token'];
-        $chat_id = $_REQUEST['chat_id'];
-
-        $response = $this->sendTestMessage($_REQUEST['token'], $_REQUEST['chat_id']);
+        $response = $this->sendTestMessage(request()->token, request()->chat_id);
 
         $response_body = json_decode($response->body());
 
@@ -146,6 +150,46 @@ class TelegramConfigCrudController extends CrudController
         // save the redirect choice for next time
         // $this->crud->setSaveAction();
         $this->crud->setSaveAction('save_and_preview');
+
+        return $this->crud->performSaveAction($item->getKey());
+    }
+
+    /**
+     * Update the specified resource in the database.
+     *
+     * @return array|\Illuminate\Http\RedirectResponse
+     */
+    public function update()
+    {
+        $this->crud->hasAccessOrFail('update');
+
+        $response = $this->sendTestMessage(request()->token, request()->chat_id);
+
+        $response_body = json_decode($response->body());
+
+        if (!$response_body->ok) {
+          Alert::add('error', $response_body->error_code.'<br>Wrong configs!<br>'.$response_body->description)->flash();
+          return back();
+        }  
+
+        // execute the FormRequest authorization and validation, if one is required
+        $request = $this->crud->validateRequest();
+
+        // register any Model Events defined on fields
+        $this->crud->registerFieldEvents();
+
+        // update the row in the db
+        $item = $this->crud->update(
+            $request->get($this->crud->model->getKeyName()),
+            $this->crud->getStrippedSaveRequest($request)
+        );
+        $this->data['entry'] = $this->crud->entry = $item;
+
+        // show a success message
+        \Alert::success(trans('backpack::crud.update_success'))->flash();
+
+        // save the redirect choice for next time
+        $this->crud->setSaveAction();
 
         return $this->crud->performSaveAction($item->getKey());
     }

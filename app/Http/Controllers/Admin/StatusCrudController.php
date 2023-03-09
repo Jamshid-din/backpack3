@@ -30,6 +30,17 @@ class StatusCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/status');
         CRUD::setEntityNameStrings('status', 'statuses');
         $this->crud->orderBy('status_order', 'ASC');
+
+        if (!backpack_user()->can('status list')) {
+          $this->crud->denyAccess('list');
+        }
+        if (!backpack_user()->can('status create')) {
+          $this->crud->denyAccess('create');
+        }
+        if (!backpack_user()->can('status update')) {
+          $this->crud->denyAccess('update');
+        }
+        $this->crud->denyAccess('delete');
     }
 
     /**

@@ -30,6 +30,19 @@ class ComplexityCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/complexity');
         CRUD::setEntityNameStrings('complexity', 'complexities');
         $this->crud->orderBy('complexity_order', 'ASC');
+
+        if (!backpack_user()->can('complexity list')) {
+          $this->crud->denyAccess('list');
+        }
+        if (!backpack_user()->can('complexity create')) {
+          $this->crud->denyAccess('create');
+        }
+        if (!backpack_user()->can('complexity update')) {
+          $this->crud->denyAccess('update');
+        }
+        if (!backpack_user()->can('complexity delete')) {
+          $this->crud->denyAccess('delete');
+        }
     }
 
     /**

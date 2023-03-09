@@ -10,7 +10,7 @@
     }
 
     if (!isset($field['options'])) {
-        $options = Spatie\Permission\Models\Role::findByName('Artist')->users;
+        $options = Spatie\Permission\Models\Role::findByName('Workshop')->users;
     } else {
         $options = call_user_func($field['options'], $field['model']::query());
     }

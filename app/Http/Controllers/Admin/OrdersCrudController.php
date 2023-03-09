@@ -48,8 +48,18 @@ class OrdersCrudController extends CrudController
         $this->crud->setModel(Orders::class);
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/orders');
         $this->crud->setEntityNameStrings('orders', 'orders');
-        $this->crud->denyAccess('delete');
         $this->crud->addButton('top', 'archive', 'view', 'crud::buttons.archive');
+
+        if (!backpack_user()->can('orders list')) {
+          $this->crud->denyAccess('list');
+        }
+        if (!backpack_user()->can('orders create')) {
+          $this->crud->denyAccess('create');
+        }
+        if (!backpack_user()->can('orders update')) {
+          $this->crud->denyAccess('update');
+        }
+        $this->crud->denyAccess('delete');
     }
 
     /**
@@ -61,12 +71,6 @@ class OrdersCrudController extends CrudController
 
     protected function setupShowOperation()
     {
-      if (!backpack_user()->can('edit orders')) {
-        $this->crud->denyAccess('edit');
-      }
-      if (!backpack_user()->can('delete orders')) {
-        $this->crud->denyAccess('delete');
-      }
       $this->crud->column('id')->makeFirst();
       $this->crud->addColumn([
         'name'  => 'created_at',
@@ -184,12 +188,6 @@ class OrdersCrudController extends CrudController
 
         $this->crud->orderBy('created_at');
 
-        if (!backpack_user()->can('edit orders')) {
-          $this->crud->denyAccess('edit');
-        }
-        if (!backpack_user()->can('delete orders')) {
-          $this->crud->denyAccess('delete');
-        }
         $this->crud->addColumn([
           'name'  => 'id',
           'label' => trans('custom.id'),
@@ -319,7 +317,7 @@ class OrdersCrudController extends CrudController
         $length = (int) request()->input('length');
         $search = request()->input('search');
 
-        if (backpack_user()->can('archive orders')) {
+        if (backpack_user()->can('orders archive')) {
           $this->crud->addClause('where', 'archived', '=', (int)request('archived')??0 );
         } else {
           $this->crud->addClause('where', 'archived', '=', 0 );
@@ -443,7 +441,7 @@ class OrdersCrudController extends CrudController
           'label'     => trans('custom.prepayment_currency'), // Table column heading
           'type'      => 'select',
           'name'      => 'prepayment_cur_id', // the column that contains the ID of that connected entity;
-          'entity'    => 'prepayment_currency', // the method that defines the relationship in your Model
+          'entity'    => 'prepaymentCurrency', // the method that defines the relationship in your Model
           'attribute' => 'symbol', // foreign key attribute that is shown to user
           'model'     => "App\Models\Currency", // foreign key model
           'wrapper' => ['class' => 'form-group col-sm-4'],
@@ -459,7 +457,7 @@ class OrdersCrudController extends CrudController
           'label'     => trans('custom.price_currency'), // Table column heading
           'type'      => 'select',
           'name'      => 'price_cur_id', // the column that contains the ID of that connected entity;
-          'entity'    => 'price_currency', // the method that defines the relationship in your Model
+          'entity'    => 'priceCurrency', // the method that defines the relationship in your Model
           'attribute' => 'symbol', // foreign key attribute that is shown to user
           'model'     => "App\Models\Currency", // foreign key model
           'wrapper' => ['class' => 'form-group col-sm-4'],
@@ -514,7 +512,7 @@ class OrdersCrudController extends CrudController
             },
           ],
         ]);
-        if (backpack_user()->can('archive orders')) {
+        if (backpack_user()->can('orders archive')) {
           $this->crud->addField([
             'name'  => 'archived',
             'label' => trans('custom.archived'),

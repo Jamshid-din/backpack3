@@ -29,6 +29,19 @@ class OrderStatusCrudController extends CrudController
         CRUD::setModel(\App\Models\OrderStatus::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/order-status');
         CRUD::setEntityNameStrings('order status', 'order statuses');
+
+        if (!backpack_user()->can('order status list')) {
+          $this->crud->denyAccess('list');
+        }
+        if (!backpack_user()->can('order status create')) {
+          $this->crud->denyAccess('create');
+        }
+        if (!backpack_user()->can('order status update')) {
+          $this->crud->denyAccess('update');
+        }
+        if (!backpack_user()->can('order status delete')) {
+          $this->crud->denyAccess('delete');
+        }
     }
 
     /**

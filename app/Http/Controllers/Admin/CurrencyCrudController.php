@@ -30,6 +30,19 @@ class CurrencyCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/currency');
         CRUD::setEntityNameStrings('currency', 'currencies');
         $this->crud->orderBy('currency_order', 'ASC');
+
+        if (!backpack_user()->can('currency list')) {
+          $this->crud->denyAccess('list');
+        }
+        if (!backpack_user()->can('currency create')) {
+          $this->crud->denyAccess('create');
+        }
+        if (!backpack_user()->can('currency update')) {
+          $this->crud->denyAccess('update');
+        }
+        if (!backpack_user()->can('currency delete')) {
+          $this->crud->denyAccess('delete');
+        }
     }
 
     /**
@@ -62,6 +75,8 @@ class CurrencyCrudController extends CrudController
     {
         $this->crud->setValidation([
           'name' => 'required',
+          'short_name' => 'required',
+          'symbol' => 'required',
           'currency_order' => 'required|max:3',
         ]);
 

@@ -13,7 +13,7 @@
     foreach ($column['value'] as &$value) {
         $value = Str::limit($value, $column['limit'], '…');
     }
-    $users = Spatie\Permission\Models\Role::findByName('Artist')->users;
+    $users = Spatie\Permission\Models\Role::findByName('Workshop')->users;
 
 @endphp
 <div style="{{$column['style']??''}}">

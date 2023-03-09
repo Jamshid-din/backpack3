@@ -3,33 +3,39 @@
 
 <!-- Users, Roles, Permissions -->
 <li class="nav-item nav-dropdown">
-  <a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon la la-users"></i> Authentication</a>
+  <a class="nav-link nav-dropdown-toggle" href="#"><i class="nav-icon la la-users"></i> {{ trans('custom.menu_authentication') }}</a>
   <ul class="nav-dropdown-items">
 
-      @if (backpack_user()->can('Manage Users'))
-        <li class="nav-item"><a class="nav-link" href="{{ backpack_url('user') }}"><i class="nav-icon la la-user"></i> <span>Users</span></a></li>
+      @if (backpack_user()->can('users list'))
+        <li class="nav-item"><a class="nav-link" href="{{ backpack_url('user') }}"><i class="nav-icon la la-user"></i> <span>{{ trans('custom.menu_users') }}</span></a></li>
       @endif
 
-      @if (backpack_user()->can('Manage Roles'))
-      <li class="nav-item"><a class="nav-link" href="{{ backpack_url('role') }}"><i class="nav-icon la la-id-badge"></i> <span>Roles</span></a></li>
+      @if (backpack_user()->can('roles list'))
+      <li class="nav-item"><a class="nav-link" href="{{ backpack_url('role') }}"><i class="nav-icon la la-id-badge"></i> <span>{{ trans('custom.menu_roles') }}</span></a></li>
       @endif
 
-      @if (backpack_user()->can('Manage Permissions'))
-      <li class="nav-item"><a class="nav-link" href="{{ backpack_url('permission') }}"><i class="nav-icon la la-key"></i> <span>Permissions</span></a></li>
+      @if (backpack_user()->can('permissions list'))
+      <li class="nav-item"><a class="nav-link" href="{{ backpack_url('permission') }}"><i class="nav-icon la la-key"></i> <span>{{ trans('custom.menu_permissions') }}</span></a></li>
       @endif
 
   </ul>
 </li> 
-@if (backpack_user()->can('view orders'))
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('orders') }}"><i class="nav-icon la la-question"></i> Orders</a></li>
+@if (backpack_user()->can('orders list'))
+  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('orders') }}"><i class="nav-icon la la-question"></i> {{ trans('custom.menu_orders') }}</a></li>
 @endif
-@if (backpack_user()->can('Manage Order Status'))
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('status') }}"><i class="nav-icon la la-question"></i> Statuses</a></li>
+@if (backpack_user()->can('status list'))
+  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('status') }}"><i class="nav-icon la la-question"></i> {{ trans('custom.menu_statuses') }}</a></li>
 @endif
-@if (backpack_user()->can('Manage Status Log'))
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('order-status') }}"><i class="nav-icon la la-question"></i> Order statuses</a></li>
+@if (backpack_user()->can('order status list'))
+  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('order-status') }}"><i class="nav-icon la la-question"></i> {{ trans('custom.menu_order_log') }}</a></li>
+@endif
+@if (backpack_user()->can('complexity list'))
+  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('complexity') }}"><i class="nav-icon la la-question"></i> {{ trans('custom.menu_complexity') }}</a></li>
+@endif
+@if (backpack_user()->can('currency list'))
+  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('currency') }}"><i class="nav-icon la la-question"></i> {{ trans('custom.menu_currency') }}</a></li>
+@endif
+@if (backpack_user()->can('telegram configs list'))
+  <li class="nav-item"><a class="nav-link" href="{{ backpack_url('telegram-config') }}"><i class="nav-icon la la-question"></i> {{ trans('custom.menu_telegram_configs') }}</a></li>
 @endif
 
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('complexity') }}"><i class="nav-icon la la-question"></i> Complexities</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('currency') }}"><i class="nav-icon la la-question"></i> Currencies</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ backpack_url('telegram-config') }}"><i class="nav-icon la la-question"></i> Telegram configs</a></li>
