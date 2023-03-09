@@ -31,13 +31,4 @@ Route::group([
     Route::crud('currency', 'CurrencyCrudController');
     Route::crud('telegram-config', 'TelegramConfigCrudController');
     Route::get('lang/{locale}', 'LanguageController@switchLanguage');
-    
-    // function ($locale)
-    // {
-    //   App::setLocale($locale);
-    //   session()->put('locale', $locale);
-    
-    //   return redirect()->back();
-    // });
-    
 }); // this should be the absolute last line of this file

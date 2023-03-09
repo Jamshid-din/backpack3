@@ -68,11 +68,15 @@ class OrdersCrudController extends CrudController
         $this->crud->denyAccess('delete');
       }
       $this->crud->column('id')->makeFirst();
-      $this->crud->column('created_at');
+      $this->crud->addColumn([
+        'name'  => 'created_at',
+        'label' => trans('custom.order_date'),
+        'type'  => 'date'
+      ]);
 
       $this->crud->addColumn([
         'name' => 'users.name', // the relationships are handled automatically
-        'label' => 'Artist', // the grid's column heading
+        'label' => trans('custom.executor'), // the grid's column heading
         'type' => 'text'
       ]);
       $this->crud->addColumn([
@@ -85,23 +89,71 @@ class OrdersCrudController extends CrudController
         }
       ]);
 
-      $this->crud->column('date_of_issue');
-      $this->crud->column('phone_number');
-      $this->crud->column('client_name');
-      $this->crud->column('desc');
-      $this->crud->column('complexity');
-      $this->crud->column('color_fabric');
-      $this->crud->column('backdrop');
-      $this->crud->column('quantity');
-      $this->crud->column('size');
-      $this->crud->column('prepayment');
-      $this->crud->column('price');
-      $this->crud->column('delivery');
+      $this->crud->addColumn([
+        'name'  => 'date_of_issue',
+        'label' => trans('custom.date_of_issue'),
+        'type'  => 'date'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'phone_number',
+        'label' => trans('custom.phone_number'),
+        'type'  => 'phone'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'client_name',
+        'label' => trans('custom.client_name'),
+        'type'  => 'text'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'desc',
+        'label' => trans('custom.desc'),
+        'type'  => 'textarea'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'complexity',
+        'label' => trans('custom.complexity'),
+        'type'  => 'text'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'color_fabric',
+        'label' => trans('custom.color_fabric'),
+        'type'  => 'text'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'backdrop',
+        'label' => trans('custom.backdrop'),
+        'type'  => 'text'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'quantity',
+        'label' => trans('custom.quantity'),
+        'type'  => 'number'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'size',
+        'label' => trans('custom.size'),
+        'type'  => 'text'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'prepayment',
+        'label' => trans('custom.prepayment'),
+        'type'  => 'number'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'price',
+        'label' => trans('custom.price'),
+        'type'  => 'number'
+      ]);
+      $this->crud->addColumn([
+        'name'  => 'delivery',
+        'label' => trans('custom.delivery'),
+        'type'  => 'text'
+      ]);
       $this->crud->addColumn(
         [
           // run a function on the CRUD model and show its return value
           'name'  => 'telegram_link',
-          'label' => 'Telegram link', // Table column heading
+          'label' => trans('telegram_link'), // Table column heading
           'type'  => 'custom_html',
           'value' => function ($entry) {
             return '<a href="'.$entry->telegram_link.'" target="_blank">'.$entry->telegram_link.'</a>';
@@ -111,7 +163,7 @@ class OrdersCrudController extends CrudController
     
       $this->crud->addColumn([
         'name' => 'photos',
-        'label' => 'Photos',
+        'label' => trans('custom.photos'),
         'type'  => 'custom_multiple_upload',
         'upload'    => true,
         'disk'      => 'uploads',
@@ -138,17 +190,25 @@ class OrdersCrudController extends CrudController
         if (!backpack_user()->can('delete orders')) {
           $this->crud->denyAccess('delete');
         }
-        $this->crud->column('id')->makeFirst();
+        $this->crud->addColumn([
+          'name'  => 'id',
+          'label' => trans('custom.id'),
+          'type'  => 'custom_html',
+          'value' => function ($entry)
+            {
+              return '<a href="/admin/orders/'.$entry->id.'/show" class="btn btn-sm btn-link">'.$entry->id.'</a>';
+            }
+        ]);
         $this->crud->addColumn([
           'name' => 'created_at', // the relationships are handled automatically
-          'label' => 'Created at', // the grid's column heading
+          'label' => trans('custom.order_date'), // the grid's column heading
           'type' => 'date',
           'orderable'  => true,
         ]);
 
         $this->crud->addColumn([
           // 1-n relationship
-          'label'     => ' User name ', // Table column heading
+          'label'     => trans('custom.executor'), // Table column heading
           'type'      => 'custom_users',
           'name'      => 'user_id', // the column that contains the ID of that connected entity;
           'entity'    => 'users', // the method that defines the relationship in your Model
@@ -158,7 +218,7 @@ class OrdersCrudController extends CrudController
 
         $this->crud->addColumn([
           // 1-n relationship
-          'label'     => 'Status', // Table column heading
+          'label'     => trans('custom.status'), // Table column heading
           'type'      => 'custom_status',
           'name'      => 'status_id', // the column that contains the ID of that connected entity;
           'entity'    => 'hasStatus', // the method that defines the relationship in your Model
@@ -166,18 +226,66 @@ class OrdersCrudController extends CrudController
           'model'     => "App\Models\Status", // foreign key model
         ]);
 
-        $this->crud->column('date_of_issue');
-        $this->crud->column('phone_number');
-        $this->crud->column('client_name');
-        $this->crud->column('desc');
-        $this->crud->column('complexity');
-        $this->crud->column('color_fabric');
-        $this->crud->column('backdrop');
-        $this->crud->column('quantity');
-        $this->crud->column('size');
-        $this->crud->column('prepayment');
-        $this->crud->column('price');
-        $this->crud->column('delivery');
+        $this->crud->addColumn([
+          'name'  => 'date_of_issue',
+          'label' => trans('custom.date_of_issue'),
+          'type'  => 'date'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'phone_number',
+          'label' => trans('custom.phone_number'),
+          'type'  => 'phone'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'client_name',
+          'label' => trans('custom.client_name'),
+          'type'  => 'text'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'desc',
+          'label' => trans('custom.desc'),
+          'type'  => 'text'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'complexity',
+          'label' => trans('custom.complexity'),
+          'type'  => 'text'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'color_fabric',
+          'label' => trans('custom.color_fabric'),
+          'type'  => 'text'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'backdrop',
+          'label' => trans('custom.backdrop'),
+          'type'  => 'text'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'quantity',
+          'label' => trans('custom.quantity'),
+          'type'  => 'number'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'size',
+          'label' => trans('custom.size'),
+          'type'  => 'text',
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'prepayment',
+          'label' => trans('custom.prepayment'),
+          'type'  => 'number',
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'price',
+          'label' => trans('custom.price'),
+          'type'  => 'number'
+        ]);
+        $this->crud->addColumn([
+          'name'  => 'delivery',
+          'label' => trans('custom.delivery'),
+          'type'  => 'text'
+        ]);
 
         $stack = 'line';
         $name = 'tested';
@@ -211,7 +319,7 @@ class OrdersCrudController extends CrudController
         $length = (int) request()->input('length');
         $search = request()->input('search');
 
-        if (backpack_user()->can('Manage archives')) {
+        if (backpack_user()->can('archive orders')) {
           $this->crud->addClause('where', 'archived', '=', (int)request('archived')??0 );
         } else {
           $this->crud->addClause('where', 'archived', '=', 0 );
@@ -277,46 +385,62 @@ class OrdersCrudController extends CrudController
         
         $this->crud->addField([
           'name' => 'created_at',
-          'label' => 'Created at',
+          'label' => trans('custom.order_date'),
           'type' => 'datetime',
           'default' => now()
         ]);
-        $this->crud->field('date_of_issue');
+        $this->crud->addField([
+          'name'  => 'date_of_issue',
+          'label' => trans('custom.date_of_issue'),
+          'type'  => 'date'
+        ]);
         $this->crud->addField([
           'name' => 'phone_number',
-          'label' => 'Phone number',
+          'label' => trans('custom.phone_number'),
           'type' => 'custom_phone',
           'prefix' => '+'
         ]);
         $this->crud->addField([
           'name' => 'client_name',
-          'label' => 'Client name',
+          'label' => trans('custom.client_name'),
           'type' => 'text',
         ]);
         $this->crud->addField([
           'name' => 'desc',
-          'label' => 'Description',
+          'label' => trans('custom.desc'),
           'type' => 'textarea',
         ]);
         $this->crud->addField([
           'name' => 'complexity',
-          'label' => 'Complexity',
+          'label' => trans('custom.complexity'),
           'type' => 'complexity',
           'hint' => 'Max. 50 characters'
         ]);
-        $this->crud->field('color_fabric');
-        $this->crud->field('backdrop');
+        $this->crud->addField([
+          'name'  => 'color_fabric',
+          'label' => trans('custom.color_fabric'),
+          'type'  => 'text'
+        ]);
+        $this->crud->addField([
+          'name'  => 'backdrop',
+          'label' => trans('custom.backdrop'),
+          'type'  => 'text'
+        ]);
         $this->crud->addField([
           'name'      => 'quantity', // The db column name
-          'label'     => 'Quantity', // Table column heading
+          'label'     => trans('custom.quantity'), // Table column heading
           'type'      => 'number',
           'decimals'  => 2,
           'limit'     => 2
         ]);
-        $this->crud->field('size');
+        $this->crud->addField([
+          'name'  => 'size',
+          'label' => trans('custom.size'),
+          'type'  => 'text'
+        ]);
         $this->crud->addField([
           'name'      => '', // The db column name
-          'label'     => 'Precurrency', // Table column heading
+          'label'     => trans('custom.prepayment_currency'), // Table column heading
           'type'      => 'select',
           'name'      => 'prepayment_cur_id', // the column that contains the ID of that connected entity;
           'entity'    => 'prepayment_currency', // the method that defines the relationship in your Model
@@ -326,13 +450,13 @@ class OrdersCrudController extends CrudController
         ]);
         $this->crud->addField([
           'name'      => 'prepayment', // The db column name
-          'label'     => 'Prepayment', // Table column heading
+          'label'     => trans('custom.prepayment'), // Table column heading
           'type'      => 'number',
           'wrapper' => ['class' => 'form-group col-sm-8'],
         ]);
         $this->crud->addField([
           'name'      => '', // The db column name
-          'label'     => 'Currency', // Table column heading
+          'label'     => trans('custom.price_currency'), // Table column heading
           'type'      => 'select',
           'name'      => 'price_cur_id', // the column that contains the ID of that connected entity;
           'entity'    => 'price_currency', // the method that defines the relationship in your Model
@@ -342,20 +466,20 @@ class OrdersCrudController extends CrudController
         ]);
         $this->crud->addField([
           'name'      => 'price', // The db column name
-          'label'     => 'Price', // Table column heading
+          'label'     => trans('custom.price'), // Table column heading
           'type'      => 'number',
           'wrapper' => ['class' => 'form-group col-sm-8'],
         ]);
         $this->crud->addField([
-          'label' => 'Delivery',
-          'type' => 'text',
           'name' => 'delivery',
+          'label' => trans('custom.delivery'),
+          'type' => 'text',
           'value' => 'Tashkent'
         ]);
 
         $this->crud->addField([   // Upload
           'name'      => 'photos',
-          'label'     => 'Photos',
+          'label'     => trans('custom.photos'),
           'type'      => 'custom_upload_multiple',
           'upload'    => true,
           // 'disk'      => 'uploads', // if you store files in the /public folder, please omit this; if you store them in /storage or S3, please specify it;
@@ -364,7 +488,7 @@ class OrdersCrudController extends CrudController
         ],);
         $this->crud->addField([
           // 1-n relationship
-          'label'     => 'Artists', // Table column heading
+          'label'     => trans('custom.executor'), // Table column heading
           'type'      => 'custom_user_select',
           'name'      => 'user_id', // the column that contains the ID of that connected entity;
           'entity'    => 'users', // the method that defines the relationship in your Model
@@ -374,7 +498,7 @@ class OrdersCrudController extends CrudController
 
         $this->crud->addField([
           // 1-n relationship
-          'label'     => 'Status', // Table column heading
+          'label'     => trans('custom.status'), // Table column heading
           'type'      => 'custom_status_select',
           'name'      => 'status_id', // the column that contains the ID of that connected entity;
           'entity'    => 'hasStatus', // the method that defines the relationship in your Model
@@ -390,10 +514,10 @@ class OrdersCrudController extends CrudController
             },
           ],
         ]);
-        if (backpack_user()->can('Manage archives')) {
+        if (backpack_user()->can('archive orders')) {
           $this->crud->addField([
             'name'  => 'archived',
-            'label' => 'Archived',
+            'label' => trans('custom.archived'),
             'type'  => 'boolean'
           ]);
         }
@@ -549,7 +673,7 @@ class OrdersCrudController extends CrudController
         'archived'  => 1
       ]);
 
-      FacadesAlert::success('Successfully archived!')->flash();
+      FacadesAlert::success(trans('custom.successfully_archived'))->flash();
 
       return back();
     }

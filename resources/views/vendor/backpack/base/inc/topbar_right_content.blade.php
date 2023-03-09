@@ -5,26 +5,8 @@
 <li class="nav-item d-md-down-none"><a class="nav-link" href="#"><i class="la la-list"></i></a></li>
 <li class="nav-item d-md-down-none"><a class="nav-link" href="#"><i class="la la-map"></i></a></li> --}}
 
-{{-- <li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      {{ Config::get('languages')[App::getLocale()] }}
-  </a>
-  <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-  @foreach (Config::get('languages') as $lang => $language)
-      @if ($lang != App::getLocale())
-              <a class="dropdown-item" href="{{ route('lang.switch', $lang) }}"> {{$language}}</a>
-      @endif
-  @endforeach
-  </div>
-</li> --}}
-{{-- @php
-  App::setLocale('en');
 
-  // Session::put('locale', 'en');
-@endphp --}}
-
-
-<span class="ml-2 mr-2 text-gray-700">{{ app()->getLocale() }}</span>
+<span class="ml-2 mr-2 text-gray-700">{{ app()->getLocale() }} </span>
 
 <a class="ml-1 underline ml-2 mr-2" href="{{url('admin/lang/en')}}">
   <span>Eng</span>
