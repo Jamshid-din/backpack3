@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\OrdersRequest;
 use App\Models\Orders;
 use App\Models\OrderStatus;
 use App\Models\TelegramConfig;
 use App\Models\TelegramInfo;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
-use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\CRUD\app\Library\Widget;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -141,12 +139,12 @@ class OrdersCrudController extends CrudController
       $this->crud->addColumn([
         'name'  => 'prepayment',
         'label' => trans('custom.prepayment'),
-        'type'  => 'number'
+        'type'  => 'prepayment_currency',
       ]);
       $this->crud->addColumn([
         'name'  => 'price',
         'label' => trans('custom.price'),
-        'type'  => 'number'
+        'type'  => 'price_currency'
       ]);
       $this->crud->addColumn([
         'name'  => 'delivery',
@@ -272,12 +270,12 @@ class OrdersCrudController extends CrudController
         $this->crud->addColumn([
           'name'  => 'prepayment',
           'label' => trans('custom.prepayment'),
-          'type'  => 'number',
+          'type'  => 'prepayment_currency',
         ]);
         $this->crud->addColumn([
           'name'  => 'price',
           'label' => trans('custom.price'),
-          'type'  => 'number'
+          'type'  => 'price_currency'
         ]);
         $this->crud->addColumn([
           'name'  => 'delivery',
@@ -307,6 +305,7 @@ class OrdersCrudController extends CrudController
          */
     }
 
+    
     public function search()
     {
         $this->crud->hasAccessOrFail('list');
