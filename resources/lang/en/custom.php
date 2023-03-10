@@ -40,4 +40,6 @@ return [
   'menu_telegram_configs' => 'Telegram configs',
   'menu_translations'  => 'Translations',
 
+  // Facades Alert messages
+  'successfully_archived' => 'Successfully archived',
 ];

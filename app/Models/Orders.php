@@ -73,7 +73,7 @@ class Orders extends Model
 
     public function makeOrderArchived()
     {
-      return (!$this->archived) ? '<a href="/admin/orders-make-archived/'.$this->id.'" class="btn btn-sm btn-link"><i class="las la-trash"></i></a>':'';
+      return (!$this->archived) ? '<a href="'.url(config('backpack.base.route_prefix').'/orders-make-archived/'.$this->id).'" class="btn btn-sm btn-link"><i class="las la-trash"></i></a>':'';
     }
 
     public function setPhotosAttribute($value)

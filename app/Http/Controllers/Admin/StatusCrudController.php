@@ -43,6 +43,22 @@ class StatusCrudController extends CrudController
         $this->crud->denyAccess('delete');
     }
 
+    protected function setupShowOperation()
+    {
+      $this->crud->column('name');
+      $this->crud->addColumn([
+        'name' => 'color',
+        'label' => 'Color',
+        'type' => 'custom_html',
+        'value'    => function ($entry)
+        {
+          return "<button class='btn' style='background-color: ".$entry->color.";'>".$entry->color."</button>";
+        },
+
+      ]);
+      $this->crud->column('status_order');
+    }
+
     /**
      * Define what happens when the List operation is loaded.
      * 

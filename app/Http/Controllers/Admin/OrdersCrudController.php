@@ -285,10 +285,9 @@ class OrdersCrudController extends CrudController
         ]);
 
         $stack = 'line';
-        $name = 'tested';
         $position = 'beginning';
-        $this->crud->addButton($stack, $name, 'model_function', 'checkTelegramMessage', $position); // possible types are: 'view', 'model_function'
-        $this->crud->addButton($stack, $name, 'model_function', 'makeOrderArchived'); // possible types are: 'view', 'model_function'
+        $this->crud->addButton($stack, 'telegram_link', 'model_function', 'checkTelegramMessage', $position); // possible types are: 'view', 'model_function'
+        $this->crud->addButton($stack, 'archive_action', 'model_function', 'makeOrderArchived'); // possible types are: 'view', 'model_function'
 
         Widget::add(
           [
@@ -373,7 +372,7 @@ class OrdersCrudController extends CrudController
             'desc' => 'required',
             'complexity' => 'required',
             'backdrop' => 'required',
-            'quantity' => 'required',
+            'quantity' => 'required|max:999|min:1',
             'size' => 'required',
             'prepayment' => 'required|max:8',
             'price' => 'required|max:8',
@@ -429,7 +428,12 @@ class OrdersCrudController extends CrudController
           'label'     => trans('custom.quantity'), // Table column heading
           'type'      => 'number',
           'decimals'  => 2,
-          'limit'     => 2
+          'limit'     => 2,
+          'hint'      => 'Max. 999',
+          'attributes' => [
+            'min' => '1',
+            'max' => '999'
+          ],
         ]);
         $this->crud->addField([
           'name'  => 'size',
@@ -577,9 +581,11 @@ class OrdersCrudController extends CrudController
           $store_telegram_response->response_body = json_encode($response->result);
           $store_telegram_response->save();
   
+          $message_id = (isset($response->result->message_id)) ? $response->result->message_id:$response->result[0]->message_id;
+          
           // Store telegram message link into orders table
           if ($response->ok) {
-            $telegram_link = 'https://t.me/c/'.$this->telegram_details['channel'].'/'.$response->result[0]->message_id;
+            $telegram_link = 'https://t.me/c/'.$this->telegram_details['channel'].'/'.$message_id;
             Orders::find($this->data['entry']->id)->update([
               'telegram_link' => $telegram_link
             ]);
