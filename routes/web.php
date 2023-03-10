@@ -18,4 +18,3 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::put('/editable-column/{id}', [EditColumnController::class, 'update']);

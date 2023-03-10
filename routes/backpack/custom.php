@@ -25,6 +25,7 @@ Route::group([
 ], function () { // custom admin routes
     Route::crud('orders', 'OrdersCrudController');
     Route::get('orders-make-archived/{id}', 'OrdersCrudController@makeOrderArchived');
+    Route::put('editable-column/{id}', 'OrdersCrudController@updateCulumns');
     Route::crud('status', 'StatusCrudController');
     Route::crud('order-status', 'OrderStatusCrudController');
     Route::crud('complexity', 'ComplexityCrudController');

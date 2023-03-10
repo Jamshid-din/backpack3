@@ -44,7 +44,6 @@ class BackpackServiceProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
-      dd(realpath(__DIR__.'/resources/lang'), 'backpack');
         $this->loadViewsWithFallbacks();
         $this->loadTranslationsFrom(realpath(__DIR__.'/resources/lang'), 'backpack');
         $this->loadConfigs();

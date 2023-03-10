@@ -10,6 +10,7 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\Widget;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 use Prologue\Alerts\Facades\Alert as FacadesAlert;
 
@@ -578,7 +579,7 @@ class OrdersCrudController extends CrudController
   
           // Store telegram message link into orders table
           if ($response->ok) {
-            $telegram_link = 'https://t.me/c/'.$this->telegram_details['channel'].'/'.$response->result->message_id;
+            $telegram_link = 'https://t.me/c/'.$this->telegram_details['channel'].'/'.$response->result[0]->message_id;
             Orders::find($this->data['entry']->id)->update([
               'telegram_link' => $telegram_link
             ]);
@@ -673,5 +674,21 @@ class OrdersCrudController extends CrudController
       FacadesAlert::success(trans('custom.successfully_archived'))->flash();
 
       return back();
+    }
+
+    public function updateCulumns($id, Request $request)
+    {
+      $order = Orders::find($id);
+
+      $data = $request->new_data;
+      
+      $order->update($data);
+
+      $order_status = new OrderStatus();
+      $order_status->order_id = $data['id'];
+      $order_status->status_id = $data['status_id'];
+      $order_status->save();
+
+      return json_encode($order);
     }
 }

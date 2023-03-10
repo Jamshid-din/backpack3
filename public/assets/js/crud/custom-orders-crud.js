@@ -92,7 +92,7 @@ jQuery(document).ready(function($) {
   function sendUpdateRequest(row_id, new_data) {
     $.ajax({
       type: 'PUT',
-      url: '/editable-column/' + row_id,
+      url: 'editable-column/' + row_id,
       data: {new_data},
       success: function(data) {
         // console.log(data);
