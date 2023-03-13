@@ -8,7 +8,6 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
-
 class Orders extends Model
 {
     use HasFactory, CrudTrait;
@@ -36,10 +35,8 @@ class Orders extends Model
       'created_at',
     ];
 
-      
     protected $casts = ['photos' => 'array'];
     protected $translatable = ['name', 'options'];
-
 
     public function statuses()
     {
@@ -81,7 +78,7 @@ class Orders extends Model
         $attribute_name = "photos";
         $disk = "public";
         $destination_path = "photos";
-    
+
         $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
     }
 
@@ -112,14 +109,52 @@ class Orders extends Model
         if (request()->hasFile($attribute_name)) {
             foreach (request()->file($attribute_name) as $key => $file) {
                 if ($file->isValid()) {
-                    // 1. Generate a new file name
-                    $new_file_name = time().$key.' '.random_int(1, 9999).$file->getClientOriginalName();
 
-                    // 2. Move the new file to the correct path
-                    $file_path = $file->storeAs($destination_path, $new_file_name, $disk);
+                  // 1. Generate a new file name
+                  $temp_file_name = time().$key.random_int(1, 9999).$file->getClientOriginalName();
 
-                    // 3. Add the public path to the database
-                    $attribute_value[] = $file_path;
+                  $compressed_formats = ['jpeg','jpg','png','gif'];
+                  // dd(in_array($file->getClientOriginalExtension(), $compressed_formats));
+                  if (in_array($file->getClientOriginalExtension(), $compressed_formats)) {
+
+                      // 2. Move the new file to the correct path
+                      $file_path = $file->storeAs($destination_path, $temp_file_name, $disk);
+  
+                      // 3. Add the public path to the database
+                      $attribute_value[] = $file_path;
+                  }
+                  else {
+                      $org_name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                      $converted_name = time().$key.' '.$org_name.'.jpg';
+
+                      // 2. Move the new file to the correct path
+                      $file_path = $file->storeAs($destination_path, $temp_file_name, $disk);
+                      $file_path_storage = 'storage/'.$file_path;
+
+                      $imagick = new \Imagick();
+                      $imagick->readImage($file_path_storage);
+                      $imagick->setImageFormat('jpeg');
+
+                      // Set the compression type
+                      $imagick->setImageCompression(\Imagick::COMPRESSION_JPEG);
+
+                      // Set the compression quality
+                      $imagick->setImageCompressionQuality(40);
+
+                      $imagick->writeImage('storage/'.$destination_path.'/'.$converted_name);
+                      
+                      $new_converted_path = $destination_path.'/'.$converted_name;
+
+                      if (Storage::disk('public')->exists($file_path)) {
+                        Storage::disk('public')->delete($file_path);
+                      }
+
+                      Storage::delete($file_path);
+
+                      // 3. Add the public path to the database
+                      $attribute_value[] = $new_converted_path;
+                  }
+
                 }
             }
         }

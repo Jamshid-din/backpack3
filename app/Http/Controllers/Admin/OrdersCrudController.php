@@ -11,7 +11,6 @@ use Backpack\CRUD\app\Library\Widget;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
-
 use Prologue\Alerts\Facades\Alert as FacadesAlert;
 
 /**
@@ -305,7 +304,6 @@ class OrdersCrudController extends CrudController
          */
     }
 
-    
     public function search()
     {
         $this->crud->hasAccessOrFail('list');
@@ -378,6 +376,7 @@ class OrdersCrudController extends CrudController
             'price' => 'required|max:8',
             'delivery' => 'required',
             'status_id' => 'required',
+            'photos.*'  => 'nullable|max:31457280'
         ]);
         
         $this->crud->addField([
@@ -484,6 +483,9 @@ class OrdersCrudController extends CrudController
           'label'     => trans('custom.photos'),
           'type'      => 'custom_upload_multiple',
           'upload'    => true,
+          'attributes' => [
+            'accept' => 'image/*, image/heic'
+          ]
           // 'disk'      => 'uploads', // if you store files in the /public folder, please omit this; if you store them in /storage or S3, please specify it;
           // optional:
           // 'temporary' => 10 // if using a service, such as S3, that requires you to make temporary URLs this will make a URL that is valid for the number of minutes specified
@@ -573,15 +575,17 @@ class OrdersCrudController extends CrudController
   
           $response = json_decode($response->body());
   
-  
           // Store response in to DB
           $store_telegram_response = new TelegramInfo();
           $store_telegram_response->order_id = $this->data['entry']->id;
           $store_telegram_response->successful = $response->ok;
-          $store_telegram_response->response_body = json_encode($response->result);
+          $store_telegram_response->response_body = (($response->result??false)) ? json_encode($response->result):json_encode($response->description);
           $store_telegram_response->save();
-  
-          $message_id = (isset($response->result->message_id)) ? $response->result->message_id:$response->result[0]->message_id;
+
+          $message_id = null;
+          if (($response->result??false)) {
+            $message_id = (($response->result->message_id??false)) ? $response->result->message_id:$response->result[0]->message_id;
+          }
           
           // Store telegram message link into orders table
           if ($response->ok) {

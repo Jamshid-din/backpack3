@@ -12,9 +12,7 @@
 
 	{{-- Show the file name and a "Clear" button on EDIT form. --}}
 	@if (isset($field['value']))
-  
     @php
-
       if (is_string($field['value'])) {
         $values = json_decode($field['value'], true) ?? [];
       } else {
@@ -46,38 +44,38 @@
 	        @include('crud::fields.inc.attributes', ['default_class' =>  isset($field['value']) && $field['value']!=null?'file_input backstrap-file-input':'file_input backstrap-file-input'])
 	        multiple
 	    >
-      <label class="backstrap-file-label" for="customFile"></label>
-  </div>
-
-  {{-- HINT --}}
-  @if (isset($field['hint']))
-      <p class="help-block">{!! $field['hint'] !!}</p>
-  @endif
-
-  @if (isset($values) && count($values))
-    <div id="preview" class="m-2">
-      <!-- Section: Images -->
-      <ul class="list-group  flex-row" style="flex-wrap: wrap;">
-        @foreach ($values as $key => $file_path)
-          <li class="list-group-item square" style="object-fit: cover; word-break: break-all;">
-            <img 
-              class="list-group-item-image image-to-preview"
-              style="max-height: 50px; max-width: 50px; cursor: pointer;" 
-              src="{{ asset(\Storage::disk($field['disk'])->url($file_path)) }}" 
-              alt="Image {{$key}}"
-            >
-          </li>
-        @endforeach
-
-      </ul>
-      <div id="image-preview-modal" class="modal">
-        <span class="close">&times;</span>
-        <img class="modal-content" id="img01" />
-        <div id="caption"></div>
-      </div>
-      <!-- Section: Images -->
+        <label class="backstrap-file-label" for="customFile"></label>
     </div>
-  @endif
+
+    {{-- HINT --}}
+    @if (isset($field['hint']))
+        <p class="help-block">{!! $field['hint'] !!}</p>
+    @endif
+
+    @if (isset($values) && count($values))
+      <div id="preview" class="m-2">
+        <!-- Section: Images -->
+        <ul class="list-group  flex-row" style="flex-wrap: wrap;">
+          @foreach ($values as $key => $file_path)
+            <li class="list-group-item square" style="object-fit: cover; word-break: break-all;">
+              <img 
+                class="list-group-item-image image-to-preview"
+                style="max-height: 50px; max-width: 50px; cursor: pointer;" 
+                src="{{ asset(\Storage::disk($field['disk'])->url($file_path)) }}" 
+                alt="Image {{$key}}"
+              >
+            </li>
+          @endforeach
+
+        </ul>
+        <div id="image-preview-modal" class="modal">
+          <span class="close">&times;</span>
+          <img class="modal-content" id="img01" />
+          <div id="caption"></div>
+        </div>
+        <!-- Section: Images -->
+      </div>
+    @endif
 
 	@include('crud::fields.inc.wrapper_end')
 
@@ -205,65 +203,65 @@
 	</style>
 	@endLoadOnce
 	@endpush
-  @push('crud_fields_scripts')
-    @loadOnce('bpFieldInitUploadMultipleElement')
-      <script>
-        function bpFieldInitUploadMultipleElement(element) {
-          var fieldName = element.attr('data-field-name');
-          var clearFileButton = element.find(".file-clear-button");
-          var fileInput = element.find("input[type=file]");
-          var inputLabel = element.find("label.backstrap-file-label");
+    @push('crud_fields_scripts')
+    	@loadOnce('bpFieldInitUploadMultipleElement')
+        <script>
+        	function bpFieldInitUploadMultipleElement(element) {
+        		var fieldName = element.attr('data-field-name');
+        		var clearFileButton = element.find(".file-clear-button");
+        		var fileInput = element.find("input[type=file]");
+        		var inputLabel = element.find("label.backstrap-file-label");
 
-          clearFileButton.click(function(e) {
-            e.preventDefault();
-            var container = $(this).parent().parent();
-            var parent = $(this).parent();
-            // remove the filename and button
-            parent.remove();
-            // if the file container is empty, remove it
-            if ($.trim(container.html())=='') {
-              container.remove();
-            }
-            $("<input type='hidden' name='clear_"+fieldName+"[]' value='"+$(this).data('filename')+"'>").insertAfter(fileInput);
-          });
+		        clearFileButton.click(function(e) {
+		        	e.preventDefault();
+		        	var container = $(this).parent().parent();
+		        	var parent = $(this).parent();
+		        	// remove the filename and button
+		        	parent.remove();
+		        	// if the file container is empty, remove it
+		        	if ($.trim(container.html())=='') {
+		        		container.remove();
+		        	}
+		        	$("<input type='hidden' name='clear_"+fieldName+"[]' value='"+$(this).data('filename')+"'>").insertAfter(fileInput);
+		        });
 
-          fileInput.change(function() {
-                inputLabel.html("{{trans('backpack::crud.upload_multiple_files_selected')}}");
-          let selectedFiles = [];
+		        fileInput.change(function() {
+	                inputLabel.html("{{trans('backpack::crud.upload_multiple_files_selected')}}");
+					let selectedFiles = [];
 
-          Array.from($(this)[0].files).forEach(file => {
-            selectedFiles.push({name: file.name, type: file.type})
-          });
+					Array.from($(this)[0].files).forEach(file => {
+						selectedFiles.push({name: file.name, type: file.type})
+					});
 
-          element.find('input').first().val(JSON.stringify(selectedFiles)).trigger('change');
-              // remove the hidden input, so that the setXAttribute method is no longer triggered
-          $(this).next("input[type=hidden]:not([name='clear_"+fieldName+"[]'])").remove();
-            });
+					element.find('input').first().val(JSON.stringify(selectedFiles)).trigger('change');
+		        	// remove the hidden input, so that the setXAttribute method is no longer triggered
+					$(this).next("input[type=hidden]:not([name='clear_"+fieldName+"[]'])").remove();
+		        });
 
-          element.find('input').on('CrudField:disable', function(e) {
-            element.children('.backstrap-file').find('input').prop('disabled', 'disabled');
-            element.children('.existing-file').find('.file-preview').each(function(i, el) {
+				element.find('input').on('CrudField:disable', function(e) {
+					element.children('.backstrap-file').find('input').prop('disabled', 'disabled');
+					element.children('.existing-file').find('.file-preview').each(function(i, el) {
 
-              let $deleteButton = $(el).find('a.file-clear-button');
+						let $deleteButton = $(el).find('a.file-clear-button');
 
-              if(deleteButton.length > 0) {
-                $deleteButton.on('click.prevent', function(e) {
-                  e.stopImmediatePropagation();
-                  return false;
-                });
-                // make the event we just registered, the first to be triggered
-                $._data($deleteButton.get(0), "events").click.reverse();
-              }
-            });
-          });
+						if(deleteButton.length > 0) {
+							$deleteButton.on('click.prevent', function(e) {
+								e.stopImmediatePropagation();
+								return false;
+							});
+							// make the event we just registered, the first to be triggered
+							$._data($deleteButton.get(0), "events").click.reverse();
+						}
+					});
+				});
 
-          element.on('CrudField:enable', function(e) {
-            element.children('.backstrap-file').find('input').removeAttr('disabled');
-            element.children('.existing-file').find('.file-preview').each(function(i, el) {
-              $(el).find('a.file-clear-button').unbind('click.prevent');
-            });
-          });
-        }
+				element.on('CrudField:enable', function(e) {
+					element.children('.backstrap-file').find('input').removeAttr('disabled');
+					element.children('.existing-file').find('.file-preview').each(function(i, el) {
+						$(el).find('a.file-clear-button').unbind('click.prevent');
+					});
+				});
+        	}
           $('.image-to-preview').click(function() {
             var modal = $('#image-preview-modal');
             var img = $(this).attr('src');
@@ -275,6 +273,6 @@
           $('.close, .modal').click(function() {
             $('#image-preview-modal').css('display', 'none');
           });
-      </script>
-      @endLoadOnce
-  @endpush
+        </script>
+        @endLoadOnce
+    @endpush
