@@ -111,7 +111,7 @@ class Orders extends Model
                 if ($file->isValid()) {
 
                   // 1. Generate a new file name
-                  $temp_file_name = time().$key.random_int(1, 9999).$file->getClientOriginalName();
+                  $temp_file_name = time().$key.random_int(1, 9999).' '.$file->getClientOriginalName();
 
                   $compressed_formats = ['jpeg','jpg','png','gif'];
                   // dd(in_array($file->getClientOriginalExtension(), $compressed_formats));
